@@ -277,12 +277,22 @@ function Index() {
   };
 
   // Cálculos derivados ------------------------------------------------------
+  // Mix de receita (Auto Center): a margem média ponderada das linhas de
+  // serviço define o custo variável implícito do negócio (100 − margem).
+  // É o que faz os sliders do mix mexerem em TODOS os resultados.
+  const mixTotalPct = state.mixReceita.reduce((s, i) => s + i.pctReceita, 0);
+  const custoVarMixPct =
+    state.mixReceita.length > 0 && mixTotalPct > 0
+      ? 100 -
+        state.mixReceita.reduce((s, i) => s + (i.pctReceita * i.margem) / mixTotalPct, 0)
+      : 0;
   const custoVarPct =
     state.comissaoPct +
     state.cmvPct +
     state.aluguelPct +
     state.taxaCartaoPct +
-    state.impostosPct;
+    state.impostosPct +
+    custoVarMixPct;
   const custoUnitario = (state.ticketMedio * custoVarPct) / 100;
   const custosFixos =
     state.fixoMarketing + state.fixoContas + state.fixoOutros + state.aluguelFixo;
@@ -1568,7 +1578,16 @@ function AjustesTab({
       {preset.especialidades && preset.especialidades.length > 0 && (
         <EspecialidadesBlock
           especialidades={state.especialidades}
-          onChange={(esp) => patch({ especialidades: esp })}
+          onChange={(esp) => {
+            // Editar uma especialidade recalcula o ticket médio geral na hora
+            // (média das especialidades) — reflexo imediato em todos os cards.
+            const comTicket = esp.filter((e) => e.ticket > 0);
+            const media =
+              comTicket.length > 0
+                ? comTicket.reduce((s, e) => s + e.ticket, 0) / comTicket.length
+                : state.ticketMedio;
+            patch({ especialidades: esp, ticketMedio: Math.round(media * 100) / 100 });
+          }}
         />
       )}
       {preset.produtoGuia && (
@@ -1614,6 +1633,12 @@ function MixReceitaBlock({
           </span>
         }
       />
+      <p className="text-xs text-muted-foreground mb-2">
+        A margem média do mix vira o custo variável do negócio:{" "}
+        <strong className="text-foreground">{(100 - margemMedia).toFixed(1)}%</strong> por venda,
+        já somado nas suas despesas variáveis — mexa nas margens e veja a barra lá embaixo reagir.
+        Não repita esses custos em CMV/comissão.
+      </p>
       <div className="space-y-2">
         {mix.map((item, i) => (
           <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr] gap-2 items-center text-sm">
@@ -1668,7 +1693,7 @@ function EspecialidadesBlock({
         tipo="receita"
         extra={
           <span className="text-xs text-muted-foreground">
-            Tickets iniciais idênticos — ajuste conforme sua realidade.
+            O ticket médio geral vira a média das especialidades assim que você edita.
           </span>
         }
       />
@@ -1715,7 +1740,8 @@ function ProdutoGuiaBlock({
     <div className="mt-6 pt-4 border-t border-border">
       <GrupoHeader emoji="⭐" titulo="Produto guia + adicionais" tipo="receita" />
       <p className="text-xs text-muted-foreground mb-3">
-        Seu carro-chefe pauta a produção. Adicionais aumentam o ticket médio da venda.
+        Seu carro-chefe pauta a produção: o ticket e o custo de insumos dele alimentam direto o
+        ticket médio e o CMV do plano inteiro. Adicionais aumentam o ticket médio da venda.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr] gap-2 mb-3">
         <input
@@ -1728,13 +1754,13 @@ function ProdutoGuiaBlock({
           label="Ticket produto"
           prefix="R$"
           value={state.produtoGuiaTicket}
-          onChange={(v) => patch({ produtoGuiaTicket: v })}
+          onChange={(v) => patch({ produtoGuiaTicket: v, ticketMedio: v })}
         />
         <NumberField
           label="Custo insumos"
           suffix="%"
           value={state.produtoGuiaCustoPct}
-          onChange={(v) => patch({ produtoGuiaCustoPct: v })}
+          onChange={(v) => patch({ produtoGuiaCustoPct: v, cmvPct: v })}
         />
       </div>
       <div>
@@ -1797,6 +1823,7 @@ function EquipeTab({
 }) {
   const prof = preset.rotulos.profissional;
   const profCap = prof.charAt(0).toUpperCase() + prof.slice(1);
+  const unidade = preset.rotulos.unidadeVenda;
 
   // Cálculos por vendedor
   const ranking = useMemo(() => {
@@ -1893,6 +1920,52 @@ function EquipeTab({
           💡 Conversão costuma ser a métrica mais rápida de melhorar com treinamento — e é a que
           mais impacta o valor esperado por lead.
         </div>
+
+        {/* Equipe vs meta — reage a cada campo editado abaixo */}
+        {(() => {
+          const unidadesNecessarias =
+            margemEfetiva > 0 ? Math.ceil(metaEfetiva / margemEfetiva) : Infinity;
+          const receitaNecessaria = isFinite(unidadesNecessarias)
+            ? unidadesNecessarias * state.ticketMedio
+            : Infinity;
+          const gap = isFinite(receitaNecessaria) ? receitaNecessaria - receitaTotalAtual : Infinity;
+          const bate = isFinite(gap) && gap <= 0;
+          const gapVendas =
+            !bate && isFinite(gap) && state.ticketMedio > 0
+              ? Math.ceil(gap / state.ticketMedio)
+              : 0;
+          return (
+            <div
+              className={`rounded-lg border p-3 mb-4 ${
+                bate
+                  ? "border-[color:var(--color-success)]/50 bg-[color:var(--color-success)]/5"
+                  : "border-[color:var(--color-warning)]/60 bg-[color:var(--color-warning)]/10"
+              }`}
+            >
+              <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">
+                Sua equipe hoje × sua meta
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2">
+                <MiniKpi label="Equipe gera hoje" value={brl(receitaTotalAtual)} />
+                <MiniKpi
+                  label="A meta pede"
+                  value={isFinite(receitaNecessaria) ? brl(receitaNecessaria) : "—"}
+                />
+                <MiniKpi
+                  label={bate ? "Sobra" : "Falta"}
+                  value={isFinite(gap) ? brl(Math.abs(gap)) : "—"}
+                  warn={!bate}
+                  highlight={bate}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {bate
+                  ? `✓ Com os números atuais (leads × conversão × ticket de cada ${prof}), a equipe já gera receita suficiente pra meta.`
+                  : `Faltam ~${num(gapVendas)} ${unidade}s/mês. Mexa nos campos abaixo (mais leads, conversão melhor ou ticket maior) e veja esse número mudar na hora.`}
+              </p>
+            </div>
+          );
+        })()}
 
         {/* CRUD */}
         <div className="space-y-3">
