@@ -36,6 +36,9 @@ export type Preset = {
   id: string;
   nome: string;
   emoji: string;
+  // Matiz (hue) OKLCH que dá a cor de marca deste nicho (0-360).
+  // A paleta inteira do app gira em torno deste valor — ver --hue-rot em styles.css.
+  corHue: number;
   ticketMin: number;
   ticketMax: number;
   ticketInicial: number; // média
@@ -67,6 +70,7 @@ export const PRESETS: Preset[] = [
     id: "acaiteria",
     nome: "Açaiteria",
     emoji: "🍧",
+    corHue: 295, // roxo/violeta — a cor do próprio açaí
     ticketMin: 45,
     ticketMax: 60,
     ticketInicial: 53,
@@ -87,6 +91,7 @@ export const PRESETS: Preset[] = [
     id: "auto-center",
     nome: "Auto Center",
     emoji: "🔧",
+    corHue: 232, // azul — precisão técnica, multi-serviço
     ticketMin: 700,
     ticketMax: 1500,
     ticketInicial: 1100,
@@ -115,6 +120,7 @@ export const PRESETS: Preset[] = [
     id: "oficina",
     nome: "Oficina Mecânica",
     emoji: "🛠️",
+    corHue: 48, // âmbar/dourado — ferramentas, calor industrial
     ticketMin: 350,
     ticketMax: 800,
     ticketInicial: 575,
@@ -141,6 +147,7 @@ export const PRESETS: Preset[] = [
     id: "salao",
     nome: "Salão de Beleza / Estúdio de Maquiagem",
     emoji: "💇",
+    corHue: 332, // rosa/magenta — elegância, universo da beleza
     ticketMin: 80,
     ticketMax: 150,
     ticketInicial: 115,
@@ -173,6 +180,7 @@ export const PRESETS: Preset[] = [
     id: "quiosque",
     nome: "Quiosque de Produtos de Beleza",
     emoji: "💄",
+    corHue: 15, // coral — compra por impulso, mais vibrante que o salão
     ticketMin: 40,
     ticketMax: 80,
     ticketInicial: 60,
@@ -201,6 +209,7 @@ export const PRESETS: Preset[] = [
     id: "clinica",
     nome: "Clínica Médica",
     emoji: "🩺",
+    corHue: 195, // verde-azulado (teal) — limpeza e confiança, cor clássica de saúde
     ticketMin: 120,
     ticketMax: 120,
     ticketInicial: 120,
@@ -230,6 +239,7 @@ export const PRESETS: Preset[] = [
     id: "pequeno-produtor",
     nome: "Pequeno Produtor de Alimentos",
     emoji: "🧁",
+    corHue: 125, // verde — natural, artesanal, caseiro
     ticketMin: 20,
     ticketMax: 35,
     ticketInicial: 27,

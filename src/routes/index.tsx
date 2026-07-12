@@ -130,7 +130,7 @@ function Index() {
   const [nichoAtivo, setNichoAtivo] = useState<string>("acaiteria");
   const [state, setState] = useState<State>(() => makeDefaults(PRESETS[0]));
   const [dark, setDark] = useState(true);
-  const [tab, setTab] = useState<"parametros" | "capacidade" | "equipe" | "plano">("parametros");
+  const [tab, setTab] = useState<"meta" | "parametros" | "capacidade" | "equipe" | "plano">("meta");
   const [nichoPendente, setNichoPendente] = useState<string | null>(null);
 
   const preset = useMemo(() => getPreset(state.nichoId), [state.nichoId]);
@@ -167,6 +167,12 @@ function Index() {
       /* ignore */
     }
   }, [nichoAtivo, hydrated]);
+
+  // Cor de marca por nicho: gira a paleta inteira pro matiz do preset ativo
+  useEffect(() => {
+    if (!hydrated) return;
+    document.documentElement.style.setProperty("--hue-rot", String(preset.corHue - 27));
+  }, [preset, hydrated]);
 
   // Persistência do tema
   useEffect(() => {
@@ -340,6 +346,7 @@ function Index() {
 
         <nav className="max-w-5xl mx-auto px-3 sm:px-6 flex gap-1 overflow-x-auto">
           {[
+            { id: "meta", label: "🎯 Meta" },
             { id: "parametros", label: "1. Ajustes" },
             { id: "capacidade", label: "2. Capacidade" },
             { id: "equipe", label: "3. Equipe" },
@@ -373,6 +380,19 @@ function Index() {
               </div>
             </div>
           </div>
+        )}
+
+        {tab === "meta" && (
+          <MetaGuiadaTab
+            state={state}
+            patch={patch}
+            preset={preset}
+            custosFixos={custosFixos}
+            margem={margem}
+            metaEfetiva={metaEfetiva}
+            recomendacao={recomendacao}
+            setTab={setTab}
+          />
         )}
 
         {tab === "parametros" && (
@@ -616,6 +636,217 @@ function Index() {
 /* =========================================================================
    AJUSTES TAB — parâmetros do nicho + blocos específicos
    ========================================================================= */
+
+function MetaGuiadaTab({
+  state,
+  patch,
+  preset,
+  custosFixos,
+  margem,
+  metaEfetiva,
+  recomendacao,
+  setTab,
+}: {
+  state: State;
+  patch: (p: Partial<State>) => void;
+  preset: Preset;
+  custosFixos: number;
+  margem: number;
+  metaEfetiva: number;
+  recomendacao: {
+    preco: number | null;
+    tipo: "folga" | "apertado" | "impossivel";
+    motivo: string;
+  };
+  setTab: (t: "meta" | "parametros" | "capacidade" | "equipe" | "plano") => void;
+}) {
+  const [comparando, setComparando] = useState(false);
+  const unidade = preset.rotulos.unidadeVenda;
+  const plural = (n: number, s: string) => `${s}${n === 1 ? "" : "s"}`;
+
+  // Cenário "mercado": só o ticket e a estrutura de custo do preset, sem
+  // nenhuma customização do usuário — é o caminho ilustrativo com médias.
+  const custoVarMercado =
+    preset.estruturaCusto.comissaoPct +
+    preset.estruturaCusto.cmvPct +
+    preset.estruturaCusto.aluguelPct +
+    preset.estruturaCusto.taxaCartaoPct;
+  const margemMercado = preset.ticketInicial * (1 - custoVarMercado / 100);
+  const unidadesMercado =
+    margemMercado > 0 ? Math.ceil(state.metaLucro / margemMercado) : Infinity;
+  const unidadesMercadoDia = isFinite(unidadesMercado) ? Math.ceil(unidadesMercado / 30) : Infinity;
+
+  // Cenário "seu negócio": usa os valores já customizados em `state`
+  // (margem e metaEfetiva já vêm calculados lá de cima, no Index()).
+  const unidadesReal = margem > 0 ? Math.ceil(metaEfetiva / margem) : Infinity;
+  const unidadesRealDia = isFinite(unidadesReal) ? Math.ceil(unidadesReal / 30) : Infinity;
+
+  let fraseComparativa = "Ajuste o ticket médio pra ver a comparação.";
+  if (isFinite(unidadesReal) && isFinite(unidadesMercado)) {
+    const diffUnidades = unidadesReal - unidadesMercado;
+    const partes: string[] = [];
+    if (Math.abs(state.ticketMedio - preset.ticketInicial) > 0.5) {
+      const pct = Math.abs(
+        ((state.ticketMedio - preset.ticketInicial) / preset.ticketInicial) * 100,
+      ).toFixed(0);
+      partes.push(
+        `seu ticket médio é ${pct}% ${state.ticketMedio < preset.ticketInicial ? "menor" : "maior"} que a média`,
+      );
+    }
+    if (custosFixos > 0) {
+      partes.push(`você tem ${brl(custosFixos)} de custo fixo por mês que o cenário de mercado não considera`);
+    }
+    const motivo = partes.length > 0 ? partes.join(" e ") : "pequenas diferenças de estrutura de custo";
+    if (Math.abs(diffUnidades) < 1) {
+      fraseComparativa =
+        "Seus números estão bem próximos da média de mercado — o caminho pra meta é praticamente o mesmo.";
+    } else if (diffUnidades > 0) {
+      fraseComparativa = `Como ${motivo}, você precisa vender ${num(diffUnidades)} ${plural(diffUnidades, unidade)} a mais por mês do que o cenário de mercado pra bater a mesma meta.`;
+    } else {
+      fraseComparativa = `Como ${motivo}, você consegue bater a meta vendendo ${num(-diffUnidades)} ${plural(-diffUnidades, unidade)} a menos por mês do que o cenário de mercado.`;
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <SectionCard
+        title="🎯 Qual é a sua meta?"
+        help="Só isso. A partir daqui, a gente calcula o caminho — você não precisa preencher mais nada pra ver o primeiro resultado."
+      >
+        <div className="flex flex-wrap gap-2 mb-3">
+          {[1000, 2000, 3000, 5000].map((v) => (
+            <button
+              key={v}
+              onClick={() => patch({ metaLucro: v })}
+              className={`px-3 py-1.5 rounded-md text-sm font-semibold transition ${
+                state.metaLucro === v
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
+              }`}
+            >
+              {brl(v)}
+            </button>
+          ))}
+          <div className="flex items-center gap-1 border border-input rounded-md px-2 py-1 bg-background">
+            <span className="text-[11px] text-muted-foreground">R$</span>
+            <input
+              type="number"
+              value={state.metaLucro}
+              onChange={(e) => patch({ metaLucro: +e.target.value })}
+              className="w-24 bg-transparent outline-none text-sm font-display text-lg"
+            />
+          </div>
+        </div>
+      </SectionCard>
+
+      <div className="rounded-xl border border-border bg-card p-4 sm:p-6 text-center">
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">
+          Com o {unidade} médio de mercado ({brl(preset.ticketInicial)})
+        </div>
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+          Pra bater <strong className="text-foreground">{brl(state.metaLucro)}</strong> de lucro
+          por mês, você precisa vender
+        </p>
+        <div className="font-display text-4xl sm:text-5xl ember-text py-1.5">
+          {num(unidadesMercado)} {plural(unidadesMercado, unidade)}/mês
+        </div>
+        <p className="text-sm text-muted-foreground">(~{num(unidadesMercadoDia)} por dia)</p>
+      </div>
+
+      <button
+        onClick={() => setComparando((c) => !c)}
+        className="w-full rounded-xl border border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 transition p-3 text-sm font-medium text-primary flex items-center justify-center gap-2 text-center"
+      >
+        <span>{comparando ? "▲" : "▼"}</span>
+        Esses números são a média do mercado. Quer ver com os seus números reais?
+      </button>
+
+      {comparando && (
+        <div className="rounded-xl border border-border bg-card p-4 space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <NumberField
+              label="Seu ticket médio"
+              value={state.ticketMedio}
+              prefix="R$"
+              onChange={(v) => patch({ ticketMedio: v })}
+            />
+            <NumberField
+              label={`Sua capacidade (${preset.capacidade.unidade})`}
+              value={state.capacidade}
+              onChange={(v) => patch({ capacidade: v })}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Quer refinar comissão, CMV, aluguel e outros custos fixos com mais detalhe? Isso fica na
+            aba{" "}
+            <button
+              onClick={() => setTab("parametros")}
+              className="text-primary underline underline-offset-2"
+            >
+              Ajustes
+            </button>
+            .
+          </p>
+
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left border-b border-border text-muted-foreground text-xs">
+                  <th className="p-2"></th>
+                  <th className="p-2">Mercado (padrão)</th>
+                  <th className="p-2">O seu negócio</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-border">
+                  <td className="p-2 text-muted-foreground">Ticket médio</td>
+                  <td className="p-2">{brl(preset.ticketInicial)}</td>
+                  <td className="p-2 font-semibold">{brl(state.ticketMedio)}</td>
+                </tr>
+                <tr>
+                  <td className="p-2 text-muted-foreground capitalize">{unidade}s/mês necessário</td>
+                  <td className="p-2">{num(unidadesMercado)}</td>
+                  <td className="p-2 font-semibold">{num(unidadesReal)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p className="text-sm rounded-lg bg-secondary/60 p-3 leading-relaxed">{fraseComparativa}</p>
+        </div>
+      )}
+
+      <SectionCard
+        title="📦 Isso cabe na sua capacidade?"
+        help={`Sua capacidade hoje: ${state.capacidade} ${preset.capacidade.unidade}.`}
+      >
+        <p className="text-sm leading-relaxed mb-3">
+          {recomendacao.tipo === "impossivel"
+            ? `Com o ticket em torno de ${brl(state.ticketMedio)}, ${recomendacao.motivo}`
+            : `O ticket de ${brl(recomendacao.preco ?? 0)} é o ${recomendacao.motivo}`}
+        </p>
+        <button
+          onClick={() => setTab("capacidade")}
+          className="text-sm text-primary underline underline-offset-2"
+        >
+          Ver detalhes de capacidade →
+        </button>
+      </SectionCard>
+
+      <SectionCard
+        title="🗓️ Seu plano pra chegar lá"
+        help="Uma rampa de 5 meses, migrando de tráfego pago pra orgânico conforme sua base de clientes cresce."
+      >
+        <button
+          onClick={() => setTab("plano")}
+          className="text-sm text-primary underline underline-offset-2"
+        >
+          Ver plano mês a mês completo →
+        </button>
+      </SectionCard>
+    </div>
+  );
+}
 
 function AjustesTab({
   state,

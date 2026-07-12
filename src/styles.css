@@ -38,48 +38,55 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.985 0.008 60);
-  --foreground: oklch(0.2 0.03 25);
+  /* Rotação de matiz (em graus) aplicada a toda a paleta de marca abaixo.
+     Cada nicho define seu próprio corHue em presets.ts; o app calcula
+     hue-rot = corHue - 27 (27 é o matiz-base original desta paleta) e
+     seta essa variável via JS. Isso gira primary/secondary/accent/ember
+     juntos, preservando a relação entre eles — não são paletas soltas.
+     Cores semânticas (destructive/success/warning) ficam fixas de propósito. */
+  --hue-rot: 268; /* default = açaí (matiz 295), evita flash antes da hidratação */
+  --background: oklch(0.985 0.008 calc(60 + var(--hue-rot)));
+  --foreground: oklch(0.2 0.03 calc(25 + var(--hue-rot)));
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.03 25);
+  --card-foreground: oklch(0.2 0.03 calc(25 + var(--hue-rot)));
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.03 25);
-  --primary: oklch(0.55 0.21 27);
-  --primary-foreground: oklch(0.99 0.01 60);
-  --secondary: oklch(0.94 0.02 40);
-  --secondary-foreground: oklch(0.25 0.04 25);
-  --muted: oklch(0.95 0.015 50);
-  --muted-foreground: oklch(0.45 0.03 30);
-  --accent: oklch(0.72 0.19 55);
-  --accent-foreground: oklch(0.15 0.02 25);
-  --ember: oklch(0.75 0.18 65);
+  --popover-foreground: oklch(0.2 0.03 calc(25 + var(--hue-rot)));
+  --primary: oklch(0.55 0.21 calc(27 + var(--hue-rot)));
+  --primary-foreground: oklch(0.99 0.01 calc(60 + var(--hue-rot)));
+  --secondary: oklch(0.94 0.02 calc(40 + var(--hue-rot)));
+  --secondary-foreground: oklch(0.25 0.04 calc(25 + var(--hue-rot)));
+  --muted: oklch(0.95 0.015 calc(50 + var(--hue-rot)));
+  --muted-foreground: oklch(0.45 0.03 calc(30 + var(--hue-rot)));
+  --accent: oklch(0.72 0.19 calc(55 + var(--hue-rot)));
+  --accent-foreground: oklch(0.15 0.02 calc(25 + var(--hue-rot)));
+  --ember: oklch(0.75 0.18 calc(65 + var(--hue-rot)));
   --destructive: oklch(0.55 0.24 27);
   --destructive-foreground: oklch(0.99 0.01 60);
   --success: oklch(0.55 0.15 145);
   --success-foreground: oklch(0.99 0.01 60);
   --warning: oklch(0.75 0.16 75);
   --warning-foreground: oklch(0.2 0.03 25);
-  --border: oklch(0.9 0.02 40);
-  --input: oklch(0.9 0.02 40);
-  --ring: oklch(0.55 0.21 27);
+  --border: oklch(0.9 0.02 calc(40 + var(--hue-rot)));
+  --input: oklch(0.9 0.02 calc(40 + var(--hue-rot)));
+  --ring: oklch(0.55 0.21 calc(27 + var(--hue-rot)));
 }
 
 .dark {
-  --background: oklch(0.16 0.015 25);
-  --foreground: oklch(0.96 0.01 60);
-  --card: oklch(0.21 0.02 25);
-  --card-foreground: oklch(0.96 0.01 60);
-  --popover: oklch(0.21 0.02 25);
-  --popover-foreground: oklch(0.96 0.01 60);
-  --primary: oklch(0.65 0.23 27);
-  --primary-foreground: oklch(0.14 0.02 25);
-  --secondary: oklch(0.26 0.02 25);
-  --secondary-foreground: oklch(0.96 0.01 60);
-  --muted: oklch(0.24 0.02 25);
-  --muted-foreground: oklch(0.72 0.03 40);
-  --accent: oklch(0.7 0.2 55);
-  --accent-foreground: oklch(0.14 0.02 25);
-  --ember: oklch(0.75 0.19 60);
+  --background: oklch(0.16 0.015 calc(25 + var(--hue-rot)));
+  --foreground: oklch(0.96 0.01 calc(60 + var(--hue-rot)));
+  --card: oklch(0.21 0.02 calc(25 + var(--hue-rot)));
+  --card-foreground: oklch(0.96 0.01 calc(60 + var(--hue-rot)));
+  --popover: oklch(0.21 0.02 calc(25 + var(--hue-rot)));
+  --popover-foreground: oklch(0.96 0.01 calc(60 + var(--hue-rot)));
+  --primary: oklch(0.65 0.23 calc(27 + var(--hue-rot)));
+  --primary-foreground: oklch(0.14 0.02 calc(25 + var(--hue-rot)));
+  --secondary: oklch(0.26 0.02 calc(25 + var(--hue-rot)));
+  --secondary-foreground: oklch(0.96 0.01 calc(60 + var(--hue-rot)));
+  --muted: oklch(0.24 0.02 calc(25 + var(--hue-rot)));
+  --muted-foreground: oklch(0.72 0.03 calc(40 + var(--hue-rot)));
+  --accent: oklch(0.7 0.2 calc(55 + var(--hue-rot)));
+  --accent-foreground: oklch(0.14 0.02 calc(25 + var(--hue-rot)));
+  --ember: oklch(0.75 0.19 calc(60 + var(--hue-rot)));
   --destructive: oklch(0.68 0.22 27);
   --destructive-foreground: oklch(0.14 0.02 25);
   --success: oklch(0.7 0.17 145);
@@ -88,7 +95,7 @@
   --warning-foreground: oklch(0.14 0.02 25);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.65 0.23 27);
+  --ring: oklch(0.65 0.23 calc(27 + var(--hue-rot)));
 }
 
 @layer base {
@@ -105,9 +112,9 @@
 @utility ember-gradient {
   background-image: linear-gradient(
     135deg,
-    oklch(0.55 0.24 27) 0%,
-    oklch(0.65 0.22 45) 50%,
-    oklch(0.78 0.18 70) 100%
+    oklch(0.55 0.24 calc(27 + var(--hue-rot))) 0%,
+    oklch(0.65 0.22 calc(45 + var(--hue-rot))) 50%,
+    oklch(0.78 0.18 calc(70 + var(--hue-rot))) 100%
   );
 }
 
