@@ -42,6 +42,7 @@ type State = {
   aluguelPct: number;
   aluguelFixo: number;
   taxaCartaoPct: number;
+  impostosPct: number;
   // Ticket
   ticketMedio: number;
   // Benchmarks
@@ -81,6 +82,7 @@ function makeDefaults(p: Preset): State {
     aluguelPct: p.estruturaCusto.aluguelPct,
     aluguelFixo: p.estruturaCusto.aluguelFixo,
     taxaCartaoPct: p.estruturaCusto.taxaCartaoPct,
+    impostosPct: 0,
     ticketMedio: p.ticketInicial,
     cacMin: p.cacMin,
     cacMax: p.cacMax,
@@ -276,12 +278,36 @@ function Index() {
 
   // Cálculos derivados ------------------------------------------------------
   const custoVarPct =
-    state.comissaoPct + state.cmvPct + state.aluguelPct + state.taxaCartaoPct;
+    state.comissaoPct +
+    state.cmvPct +
+    state.aluguelPct +
+    state.taxaCartaoPct +
+    state.impostosPct;
   const custoUnitario = (state.ticketMedio * custoVarPct) / 100;
   const custosFixos =
     state.fixoMarketing + state.fixoContas + state.fixoOutros + state.aluguelFixo;
   const metaEfetiva = state.metaLucro + custosFixos;
   const margem = state.ticketMedio - custoUnitario;
+
+  // Anúncio pago é despesa de verdade: em média, cada venda carrega o CAC
+  // médio na fatia que não vem do orgânico. É isso que faz CAC e % orgânico
+  // mexerem no resultado final — sem esse desconto, o "no bolso" mentiria.
+  const cacMed = (state.cacMin + state.cacMax) / 2;
+  const convMed = (state.convMin + state.convMax) / 2;
+  const pctOrgAvg =
+    state.meses.length > 0
+      ? state.meses.reduce((s, m) => s + m.pctOrganico, 0) / state.meses.length
+      : 0;
+  const custoAdsPorVenda = (1 - pctOrgAvg / 100) * cacMed;
+  const margemEfetiva = margem - custoAdsPorVenda;
+
+  // Números canônicos do mês (usados na barra fixa e na aba Meta)
+  const unidadesMeta = margemEfetiva > 0 ? Math.ceil(metaEfetiva / margemEfetiva) : Infinity;
+  const investAdsMes = isFinite(unidadesMeta) ? unidadesMeta * custoAdsPorVenda : Infinity;
+  const alcanceMes =
+    isFinite(unidadesMeta) && convMed > 0
+      ? Math.ceil((unidadesMeta * (pctOrgAvg / 100)) / (convMed / 100))
+      : Infinity;
 
   // Faixa de tickets para o PriceBar / Capacidade.
   // Os candidatos são ancorados em final 9,90 (regra da casa: sempre pra
@@ -297,16 +323,19 @@ function Index() {
     return state.meses.map((m) => {
       const lucroAlvo = state.metaLucro * (m.pctMeta / 100);
       const alvoEfetivo = lucroAlvo + custosFixos;
-      const unidades = margem > 0 ? Math.ceil(alvoEfetivo / margem) : Infinity;
-      const uOrg = Math.round(unidades * (m.pctOrganico / 100));
-      const uPago = unidades - uOrg;
+      // margem do mês já descontando o anúncio: quanto menor o % orgânico,
+      // mais caro fica cada venda — por isso mexer no slider muda as unidades
+      const margemMes = margem - (1 - m.pctOrganico / 100) * cacMed;
+      const unidades = margemMes > 0 ? Math.ceil(alvoEfetivo / margemMes) : Infinity;
+      const uOrg = isFinite(unidades) ? Math.round(unidades * (m.pctOrganico / 100)) : Infinity;
+      const uPago = isFinite(unidades) ? unidades - uOrg : Infinity;
       const invMin = uPago * state.cacMin;
       const invMax = uPago * state.cacMax;
       const alcMax = state.convMin > 0 ? uOrg / (state.convMin / 100) : Infinity;
       const alcMin = state.convMax > 0 ? uOrg / (state.convMax / 100) : Infinity;
       return { lucroAlvo, unidades, uOrg, uPago, invMin, invMax, alcMin, alcMax };
     });
-  }, [state.meses, state.metaLucro, margem, state.cacMin, state.cacMax, state.convMin, state.convMax, custosFixos]);
+  }, [state.meses, state.metaLucro, margem, cacMed, state.cacMin, state.cacMax, state.convMin, state.convMax, custosFixos]);
 
   // Capacidade normalizada pro mês: presets com período "dia" (açaí, auto
   // center, quiosque) informam capacidade diária — a meta é mensal, então a
@@ -317,16 +346,19 @@ function Index() {
   const capacidadeCalc = useMemo(() => {
     return faixaTickets.map((p) => {
       const custoP = (p * custoVarPct) / 100;
-      const marg = p - custoP;
+      // margem efetiva do candidato: preço − custos variáveis − anúncio médio
+      const marg = p - custoP - custoAdsPorVenda;
       const necessarias = marg > 0 ? Math.ceil(metaEfetiva / marg) : Infinity;
       const suficiente = capacidadeMes >= necessarias;
       const lucroMaxBruto = capacidadeMes * marg - custosFixos;
       const lucroMax = suficiente ? state.metaLucro : Math.max(0, lucroMaxBruto);
       const precoMin =
-        capacidadeMes > 0 ? metaEfetiva / (capacidadeMes * (1 - custoVarPct / 100)) : Infinity;
+        capacidadeMes > 0 && custoVarPct < 100
+          ? (metaEfetiva / capacidadeMes + custoAdsPorVenda) / (1 - custoVarPct / 100)
+          : Infinity;
       return { preco: p, marg, necessarias, suficiente, lucroMax, precoMin };
     });
-  }, [faixaTickets, custoVarPct, metaEfetiva, capacidadeMes, custosFixos, state.metaLucro]);
+  }, [faixaTickets, custoVarPct, custoAdsPorVenda, metaEfetiva, capacidadeMes, custosFixos, state.metaLucro]);
 
   // Recomendação de ticket. Regra da casa: nunca sugerir baixar o preço —
   // se o ticket atual entrega a meta dentro da capacidade, mantenha; se não
@@ -440,7 +472,7 @@ function Index() {
         </nav>
       </header>
 
-      <main className="max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-24 space-y-4">
+      <main className="max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-36 sm:pb-28 space-y-4">
         {preset.avisoConfianca && (
           <div className="rounded-lg border border-[color:var(--color-warning)]/60 bg-[color:var(--color-warning)]/15 p-3 text-xs sm:text-sm">
             <div className="flex items-start gap-2">
@@ -462,8 +494,12 @@ function Index() {
             preset={preset}
             custosFixos={custosFixos}
             custoVarPct={custoVarPct}
-            margem={margem}
+            margemEfetiva={margemEfetiva}
+            custoAdsPorVenda={custoAdsPorVenda}
             metaEfetiva={metaEfetiva}
+            unidadesMeta={unidadesMeta}
+            investAdsMes={investAdsMes}
+            alcanceMes={alcanceMes}
             recomendacao={recomendacao}
             setTab={setTab}
           />
@@ -587,7 +623,7 @@ function Index() {
             patch={patch}
             preset={preset}
             metaEfetiva={metaEfetiva}
-            margem={margem}
+            margemEfetiva={margemEfetiva}
             capacidadeMes={capacidadeMes}
           />
         )}
@@ -702,12 +738,13 @@ function Index() {
       </main>
 
       <ResumoBar
-        metaLucro={state.metaLucro}
         custosFixos={custosFixos}
         ticket={state.ticketMedio}
         custoUnitario={custoUnitario}
-        margem={margem}
-        metaEfetiva={metaEfetiva}
+        margemEfetiva={margemEfetiva}
+        unidadesMeta={unidadesMeta}
+        investAdsMes={investAdsMes}
+        alcanceMes={alcanceMes}
         unidade={preset.rotulos.unidadeVenda}
       />
 
@@ -730,65 +767,90 @@ function Index() {
    ========================================================================= */
 
 function ResumoBar({
-  metaLucro,
   custosFixos,
   ticket,
   custoUnitario,
-  margem,
-  metaEfetiva,
+  margemEfetiva,
+  unidadesMeta,
+  investAdsMes,
+  alcanceMes,
   unidade,
 }: {
-  metaLucro: number;
   custosFixos: number;
   ticket: number;
   custoUnitario: number;
-  margem: number;
-  metaEfetiva: number;
+  margemEfetiva: number;
+  unidadesMeta: number;
+  investAdsMes: number;
+  alcanceMes: number;
   unidade: string;
 }) {
-  const unidades = margem > 0 ? Math.ceil(metaEfetiva / margem) : Infinity;
-  const receita = isFinite(unidades) ? unidades * ticket : Infinity;
-  const despesas = isFinite(unidades) ? custosFixos + unidades * custoUnitario : Infinity;
+  const receita = isFinite(unidadesMeta) ? unidadesMeta * ticket : Infinity;
+  const despesas = isFinite(unidadesMeta)
+    ? custosFixos + unidadesMeta * custoUnitario + investAdsMes
+    : Infinity;
   const bolso = isFinite(receita) ? receita - despesas : -Infinity;
   const itens = [
-    {
-      label: "Receita/mês",
-      valor: brl(receita),
-      cor: "text-primary",
-    },
+    { label: "Receita/mês", valor: brl(receita), cor: "text-primary", destaque: false },
     {
       label: "Despesas/mês",
       valor: isFinite(despesas) ? `− ${brl(despesas)}` : "—",
       cor: "text-destructive",
+      destaque: false,
     },
     {
       label: "No seu bolso",
       valor: isFinite(bolso) ? brl(bolso) : "—",
       cor: "text-[color:var(--color-success)]",
+      destaque: true,
     },
     {
       label: "Vendas p/ meta",
-      valor: isFinite(unidades) ? `${num(unidades)} ${unidade}s` : "—",
+      valor: isFinite(unidadesMeta) ? `${num(unidadesMeta)} ${unidade}s` : "—",
       cor: "text-foreground",
+      destaque: false,
+    },
+    {
+      label: "Anúncios/mês",
+      valor: isFinite(investAdsMes) ? brl(investAdsMes) : "—",
+      cor: "text-foreground",
+      destaque: false,
+    },
+    {
+      label: "Alcance orgânico",
+      valor: isFinite(alcanceMes) ? `${num(alcanceMes)} pessoas` : "—",
+      cor: "text-foreground",
+      destaque: false,
     },
   ];
   return (
-    <div className="fixed bottom-0 inset-x-0 z-20 border-t border-border bg-card/95 backdrop-blur">
-      <div className="max-w-5xl mx-auto grid grid-cols-4 gap-1 px-2 sm:px-6 py-1.5">
+    <div className="fixed bottom-0 inset-x-0 z-20 border-t-2 border-primary/40 bg-card/95 backdrop-blur shadow-[0_-4px_16px_rgba(0,0,0,0.15)]">
+      <div className="max-w-5xl mx-auto grid grid-cols-3 sm:grid-cols-6 gap-1.5 px-2 sm:px-6 py-2 sm:py-2.5">
         {itens.map((i) => (
-          <div key={i.label} className="text-center min-w-0">
+          <div
+            key={i.label}
+            className={`text-center min-w-0 rounded-md py-1 ${
+              i.destaque ? "bg-[color:var(--color-success)]/10" : ""
+            }`}
+          >
             <div className="text-[9px] sm:text-[10px] uppercase tracking-wide text-muted-foreground truncate">
               {i.label}
             </div>
-            <div className={`font-display text-xs sm:text-base leading-tight truncate ${i.cor}`}>
+            {/* key={valor} remonta o span quando o valor muda e replay a
+                animação — é o "senti que mexeu" da barra */}
+            <div
+              key={i.valor}
+              className={`font-display text-sm sm:text-xl leading-tight truncate value-flash ${i.cor}`}
+            >
               {i.valor}
             </div>
           </div>
         ))}
       </div>
-      {margem <= 0 && (
-        <div className="bg-destructive text-destructive-foreground text-center text-[11px] py-0.5">
-          ⚠️ Seus custos variáveis são maiores que o ticket — nenhuma venda dá lucro assim.
+      {margemEfetiva <= 0 && (
+        <div className="bg-destructive text-destructive-foreground text-center text-[11px] py-1">
+          ⚠️ Entre custos e anúncio, cada venda sai no prejuízo — suba o ticket, corte custos ou
+          aumente a fatia orgânica no plano.
         </div>
       )}
     </div>
@@ -878,8 +940,12 @@ function MetaGuiadaTab({
   preset,
   custosFixos,
   custoVarPct,
-  margem,
+  margemEfetiva,
+  custoAdsPorVenda,
   metaEfetiva,
+  unidadesMeta,
+  investAdsMes,
+  alcanceMes,
   recomendacao,
   setTab,
 }: {
@@ -888,8 +954,12 @@ function MetaGuiadaTab({
   preset: Preset;
   custosFixos: number;
   custoVarPct: number;
-  margem: number;
+  margemEfetiva: number;
+  custoAdsPorVenda: number;
   metaEfetiva: number;
+  unidadesMeta: number;
+  investAdsMes: number;
+  alcanceMes: number;
   recomendacao: {
     preco: number | null;
     tipo: "folga" | "apertado" | "subir" | "impossivel";
@@ -911,9 +981,10 @@ function MetaGuiadaTab({
   const unidadesMercado =
     margemMercado > 0 ? Math.ceil(state.metaLucro / margemMercado) : Infinity;
 
-  // Cenário "seu negócio": o protagonista. Usa ticket, custos fixos e
-  // variáveis do usuário — o número grande é sempre este.
-  const unidadesReal = margem > 0 ? Math.ceil(metaEfetiva / margem) : Infinity;
+  // Cenário "seu negócio": o protagonista. Usa ticket, custos fixos,
+  // variáveis E o custo médio de anúncio por venda — o número grande é
+  // sempre este (o mesmo da barra fixa lá embaixo).
+  const unidadesReal = unidadesMeta;
   const unidadesRealDia = isFinite(unidadesReal)
     ? Math.ceil(unidadesReal / state.diasVenda)
     : Infinity;
@@ -921,14 +992,33 @@ function MetaGuiadaTab({
 
   // Ancoragem 9,90 (sempre pra cima) e o ganho que ela traz
   const precoAncorado = ancorar(state.ticketMedio);
-  const margemAncorada = precoAncorado * (1 - custoVarPct / 100);
+  const margemAncorada = precoAncorado * (1 - custoVarPct / 100) - custoAdsPorVenda;
   const unidadesAncorado =
     margemAncorada > 0 ? Math.ceil(metaEfetiva / margemAncorada) : Infinity;
   const ganhoAncoragemMes =
-    isFinite(unidadesReal) && margem > 0
-      ? unidadesReal * (margemAncorada - margem)
+    isFinite(unidadesReal) && margemEfetiva > 0
+      ? unidadesReal * (margemAncorada - margemEfetiva)
       : 0;
   const jaAncorado = precoAncorado - state.ticketMedio < 0.05;
+
+  // Texto do plano compartilhável (WhatsApp)
+  const nomeNegocio = state.nomeNegocio.trim() || preset.nome;
+  const textoPlano = isFinite(unidadesReal)
+    ? [
+        `🎯 Meu plano — ${nomeNegocio}`,
+        `Meta no bolso: ${brl(state.metaLucro)}/mês`,
+        `Vender: ${num(unidadesReal)} ${plural(unidadesReal, unidade)}/mês (~${num(unidadesRealDia)}/dia) a ${brl(state.ticketMedio)}`,
+        isFinite(alcanceMes) && alcanceMes > 0
+          ? `Alcançar: ~${num(alcanceMes)} pessoas/mês no orgânico`
+          : null,
+        isFinite(investAdsMes) && investAdsMes > 0
+          ? `Investir: ~${brl(investAdsMes)}/mês em anúncios`
+          : null,
+        `— feito no Planejador de Receita`,
+      ]
+        .filter(Boolean)
+        .join("\n")
+    : null;
 
   let fraseComparativa = "Ajuste o ticket médio pra ver a comparação.";
   if (isFinite(unidadesReal) && isFinite(unidadesMercado)) {
@@ -944,6 +1034,11 @@ function MetaGuiadaTab({
     }
     if (custosFixos > 0) {
       partes.push(`você tem ${brl(custosFixos)} de custo fixo por mês que o cenário de mercado não considera`);
+    }
+    if (custoAdsPorVenda > 0) {
+      partes.push(
+        `o seu número já desconta ~${brl(custoAdsPorVenda)} de anúncio por venda (o cenário de mercado não desconta)`,
+      );
     }
     const motivo = partes.length > 0 ? partes.join(" e ") : "pequenas diferenças de estrutura de custo";
     if (Math.abs(diffUnidades) < 1) {
@@ -1022,7 +1117,7 @@ function MetaGuiadaTab({
         <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">
           O seu negócio · ticket de {brl(state.ticketMedio)}
         </div>
-        {margem > 0 ? (
+        {margemEfetiva > 0 ? (
           <>
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
               Pra sobrar <strong className="text-foreground">{brl(state.metaLucro)}</strong> no seu
@@ -1052,19 +1147,33 @@ function MetaGuiadaTab({
                 {[
                   custosFixos > 0 ? `${brl(custosFixos)} de despesas fixas` : null,
                   custoVarPct > 0
-                    ? `${custoVarPct.toFixed(1).replace(".", ",")}% de custos variáveis por venda`
+                    ? `${custoVarPct.toFixed(1).replace(".", ",")}% de custos variáveis`
+                    : null,
+                  custoAdsPorVenda > 0
+                    ? `~${brl(custoAdsPorVenda)} de anúncio por venda`
                     : null,
                 ]
                   .filter(Boolean)
-                  .join(" e ")}
+                  .join(", ")}
                 . Sobra de verdade.
               </p>
+            )}
+            {textoPlano && (
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(textoPlano)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block mt-3 text-xs px-4 py-2 rounded-md bg-[color:var(--color-success)] text-[color:var(--color-success-foreground)] font-semibold hover:opacity-90"
+              >
+                📲 Compartilhar meu plano no WhatsApp
+              </a>
             )}
           </>
         ) : (
           <p className="text-sm text-destructive leading-relaxed py-4">
-            ⚠️ Seus custos variáveis somam {custoVarPct.toFixed(1)}% do ticket — nenhuma venda
-            deixa dinheiro no bolso assim. Revise seus custos na aba Ajustes ou suba o ticket.
+            ⚠️ Entre custos variáveis ({custoVarPct.toFixed(1)}% do ticket) e o anúncio médio por
+            venda ({brl(custoAdsPorVenda)}), nenhuma venda deixa dinheiro no bolso. Suba o ticket,
+            corte custos ou aumente a fatia orgânica no plano.
           </p>
         )}
       </div>
@@ -1103,7 +1212,7 @@ function MetaGuiadaTab({
       </div>
 
       {/* Ancoragem de preço 9,90 */}
-      {margem > 0 &&
+      {margemEfetiva > 0 &&
         (jaAncorado ? (
           <div className="rounded-xl border border-[color:var(--color-success)]/50 bg-[color:var(--color-success)]/5 p-3 text-sm">
             ✓ Seu preço já está ancorado em final 9,90 — padrão que o cliente percebe como mais
@@ -1323,6 +1432,16 @@ function AjustesTab({
             step={0.1}
             suffix="%"
             onChange={(v) => patch({ taxaCartaoPct: v })}
+          />
+          <SliderField
+            label="Impostos sobre venda"
+            hint="Alíquota efetiva do seu MEI/Simples — confirme com seu contador"
+            value={state.impostosPct}
+            min={0}
+            max={20}
+            step={0.5}
+            suffix="%"
+            onChange={(v) => patch({ impostosPct: v })}
           />
         </div>
       </div>
@@ -1666,14 +1785,14 @@ function EquipeTab({
   patch,
   preset,
   metaEfetiva,
-  margem,
+  margemEfetiva,
   capacidadeMes,
 }: {
   state: State;
   patch: (p: Partial<State>) => void;
   preset: Preset;
   metaEfetiva: number;
-  margem: number;
+  margemEfetiva: number;
   capacidadeMes: number;
 }) {
   const prof = preset.rotulos.profissional;
@@ -1884,7 +2003,7 @@ function EquipeTab({
         patch={patch}
         preset={preset}
         metaEfetiva={metaEfetiva}
-        margem={margem}
+        margemEfetiva={margemEfetiva}
         capacidadeMes={capacidadeMes}
       />
     </div>
@@ -1900,14 +2019,14 @@ function ContratacaoCard({
   patch,
   preset,
   metaEfetiva,
-  margem,
+  margemEfetiva,
   capacidadeMes,
 }: {
   state: State;
   patch: (p: Partial<State>) => void;
   preset: Preset;
   metaEfetiva: number;
-  margem: number;
+  margemEfetiva: number;
   capacidadeMes: number;
 }) {
   const unidade = preset.rotulos.unidadeVenda;
@@ -1918,14 +2037,15 @@ function ContratacaoCard({
   const encargos = state.funcSalario * (ENCARGOS_SIMPLES_PCT / 100);
   const custoTotal = state.funcSalario + encargos + state.funcOutrosCustos;
 
-  // Engenharia reversa: quantas vendas A MAIS pagam esse custo
-  const vendasExtra = margem > 0 ? Math.ceil(custoTotal / margem) : Infinity;
+  // Engenharia reversa: quantas vendas A MAIS pagam esse custo (a margem
+  // efetiva já desconta custos variáveis e o anúncio médio por venda)
+  const vendasExtra = margemEfetiva > 0 ? Math.ceil(custoTotal / margemEfetiva) : Infinity;
   const vendasExtraDia = isFinite(vendasExtra)
     ? Math.ceil(vendasExtra / state.diasVenda)
     : Infinity;
 
   // Contexto: quanto isso representa sobre o que já precisa ser vendido
-  const unidadesMeta = margem > 0 ? Math.ceil(metaEfetiva / margem) : Infinity;
+  const unidadesMeta = margemEfetiva > 0 ? Math.ceil(metaEfetiva / margemEfetiva) : Infinity;
   const pctAumento =
     isFinite(vendasExtra) && isFinite(unidadesMeta) && unidadesMeta > 0
       ? (vendasExtra / unidadesMeta) * 100
@@ -2019,11 +2139,11 @@ function ContratacaoCard({
             </>
           )}
         </p>
-        {isFinite(vendasExtra) && margem > 0 && (
+        {isFinite(vendasExtra) && margemEfetiva > 0 && (
           <p className="text-xs text-muted-foreground mt-2">
             A partir daí, cada {unidade} extra que ele ajudar a gerar coloca{" "}
-            <strong className="text-[color:var(--color-success)]">{brl(margem)}</strong> de margem
-            no seu bolso.
+            <strong className="text-[color:var(--color-success)]">{brl(margemEfetiva)}</strong> de
+            margem no seu bolso — já descontando custos e anúncio.
           </p>
         )}
       </div>
@@ -2402,8 +2522,15 @@ function Dashboard({
   const mc = preco - custoUnitario;
   const margemPct = preco > 0 ? (mc / preco) * 100 : 0;
   const metaEfetiva = metaLucro + custosFixos;
-  const breakEven = mc > 0 ? Math.ceil(metaEfetiva / mc) : Infinity;
-  const pontoEquilibrio = mc > 0 ? Math.ceil(custosFixos / mc) : 0;
+  // Mesma regra do resto do app: cada venda carrega o custo médio de anúncio
+  // na fatia que não vem do orgânico.
+  const pctOrgAvgCalc =
+    meses.length > 0 ? meses.reduce((s, m) => s + m.pctOrganico, 0) / meses.length : 0;
+  const cacMedio = (cacMin + cacMax) / 2;
+  const adsPorVenda = (1 - pctOrgAvgCalc / 100) * cacMedio;
+  const mcEfetiva = mc - adsPorVenda;
+  const breakEven = mcEfetiva > 0 ? Math.ceil(metaEfetiva / mcEfetiva) : Infinity;
+  const pontoEquilibrio = mcEfetiva > 0 ? Math.ceil(custosFixos / mcEfetiva) : 0;
   const roasMin = cacMin > 0 ? preco / cacMin : Infinity;
   const roasMax = cacMax > 0 ? preco / cacMax : Infinity;
   const lucroAdMin = mc - cacMax;
@@ -2431,7 +2558,7 @@ function Dashboard({
   const adRuim = roiAd < 100;
 
   const precoPromo = preco * (1 - descontoPromo / 100);
-  const margemPromo = precoPromo - custoUnitario;
+  const margemPromo = precoPromo - custoUnitario - adsPorVenda;
   const unidadesPromo = margemPromo > 0 ? Math.ceil(metaEfetiva / margemPromo) : Infinity;
   const extraUnidades =
     isFinite(unidadesPromo) && isFinite(breakEven) ? unidadesPromo - breakEven : Infinity;
@@ -2459,7 +2586,7 @@ function Dashboard({
     {
       label: `${unidadeVenda}s p/ meta`,
       value: `${num(breakEven)}`,
-      hint: custosFixos > 0 ? "meta + fixos" : "no mês inteiro",
+      hint: "meta + fixos + anúncios",
       tone: "primary",
     },
     {

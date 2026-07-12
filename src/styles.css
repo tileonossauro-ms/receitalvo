@@ -124,3 +124,19 @@
   background-clip: text;
   color: transparent;
 }
+
+/* Flash rápido usado na barra-resumo quando um valor muda (o elemento é
+   remontado via key={valor}, o que reinicia a animação). */
+@utility value-flash {
+  animation: value-flash 0.7s ease-out;
+}
+
+@keyframes value-flash {
+  0% {
+    background-color: oklch(0.72 0.19 calc(55 + var(--hue-rot)) / 35%);
+    border-radius: 4px;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
