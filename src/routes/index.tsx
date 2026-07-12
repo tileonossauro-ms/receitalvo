@@ -319,6 +319,24 @@ function Index() {
       ? Math.ceil((unidadesMeta * (pctOrgAvg / 100)) / (convMed / 100))
       : Infinity;
 
+  // Três cenários pro painel de resultado: otimista (CAC mín + conversão
+  // máx), médio e pessimista (CAC máx + conversão mín). É a faixa que o
+  // usuário vê embaixo de cada número grande.
+  const cenario = (cac: number, conv: number) => {
+    const ads = (1 - pctOrgAvg / 100) * cac;
+    const marg = margem - ads;
+    const un = marg > 0 ? Math.ceil(metaEfetiva / marg) : Infinity;
+    const inv = isFinite(un) ? un * ads : Infinity;
+    const alc =
+      isFinite(un) && conv > 0 ? Math.ceil((un * (pctOrgAvg / 100)) / (conv / 100)) : Infinity;
+    const rec = isFinite(un) ? un * state.ticketMedio : Infinity;
+    const desp = isFinite(un) ? custosFixos + un * custoUnitario + inv : Infinity;
+    return { un, inv, alc, rec, desp };
+  };
+  const cenOtimista = cenario(state.cacMin, state.convMax);
+  const cenMedio = cenario(cacMed, convMed);
+  const cenPessimista = cenario(state.cacMax, state.convMin);
+
   // Faixa de tickets para o PriceBar / Capacidade.
   // Os candidatos são ancorados em final 9,90 (regra da casa: sempre pra
   // cima); o ticket atual do usuário entra exato pra manter a seleção.
@@ -482,7 +500,7 @@ function Index() {
         </nav>
       </header>
 
-      <main className="max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-36 sm:pb-28 space-y-4">
+      <main className="max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-56 sm:pb-44 space-y-4">
         {preset.avisoConfianca && (
           <div className="rounded-lg border border-[color:var(--color-warning)]/60 bg-[color:var(--color-warning)]/15 p-3 text-xs sm:text-sm">
             <div className="flex items-start gap-2">
@@ -748,13 +766,10 @@ function Index() {
       </main>
 
       <ResumoBar
-        custosFixos={custosFixos}
-        ticket={state.ticketMedio}
-        custoUnitario={custoUnitario}
+        otimista={cenOtimista}
+        medio={cenMedio}
+        pessimista={cenPessimista}
         margemEfetiva={margemEfetiva}
-        unidadesMeta={unidadesMeta}
-        investAdsMes={investAdsMes}
-        alcanceMes={alcanceMes}
         unidade={preset.rotulos.unidadeVenda}
       />
 
@@ -776,86 +791,108 @@ function Index() {
    Resumo fixo — Receita · Despesas · No bolso, visível em todas as abas
    ========================================================================= */
 
+type Cenario = { un: number; inv: number; alc: number; rec: number; desp: number };
+
 function ResumoBar({
-  custosFixos,
-  ticket,
-  custoUnitario,
+  otimista,
+  medio,
+  pessimista,
   margemEfetiva,
-  unidadesMeta,
-  investAdsMes,
-  alcanceMes,
   unidade,
 }: {
-  custosFixos: number;
-  ticket: number;
-  custoUnitario: number;
+  otimista: Cenario;
+  medio: Cenario;
+  pessimista: Cenario;
   margemEfetiva: number;
-  unidadesMeta: number;
-  investAdsMes: number;
-  alcanceMes: number;
   unidade: string;
 }) {
-  const receita = isFinite(unidadesMeta) ? unidadesMeta * ticket : Infinity;
-  const despesas = isFinite(unidadesMeta)
-    ? custosFixos + unidadesMeta * custoUnitario + investAdsMes
-    : Infinity;
-  const bolso = isFinite(receita) ? receita - despesas : -Infinity;
+  const bolso = isFinite(medio.rec) ? medio.rec - medio.desp : -Infinity;
+  const faixaBrl = (a: number, b: number) =>
+    `${isFinite(a) ? brl(a) : "—"} – ${isFinite(b) ? brl(b) : "∞"}`;
+  const faixaNum = (a: number, b: number) =>
+    `${isFinite(a) ? num(a) : "—"} – ${isFinite(b) ? num(b) : "∞"}`;
   const itens = [
-    { label: "Receita/mês", valor: brl(receita), cor: "text-primary", destaque: false },
+    {
+      label: "Receita/mês",
+      valor: isFinite(medio.rec) ? brl(medio.rec) : "—",
+      faixa: faixaBrl(otimista.rec, pessimista.rec),
+      cor: "text-primary",
+      destaque: false,
+    },
     {
       label: "Despesas/mês",
-      valor: isFinite(despesas) ? `− ${brl(despesas)}` : "—",
+      valor: isFinite(medio.desp) ? `− ${brl(medio.desp)}` : "—",
+      faixa: faixaBrl(otimista.desp, pessimista.desp),
       cor: "text-destructive",
       destaque: false,
     },
     {
       label: "No seu bolso",
       valor: isFinite(bolso) ? brl(bolso) : "—",
+      faixa: "protegido do melhor ao pior cenário",
       cor: "text-[color:var(--color-success)]",
       destaque: true,
     },
     {
       label: "Vendas p/ meta",
-      valor: isFinite(unidadesMeta) ? `${num(unidadesMeta)} ${unidade}s` : "—",
+      valor: isFinite(medio.un) ? `${num(medio.un)} ${unidade}s` : "—",
+      faixa: faixaNum(otimista.un, pessimista.un),
       cor: "text-foreground",
       destaque: false,
     },
     {
       label: "Anúncios/mês",
-      valor: isFinite(investAdsMes) ? brl(investAdsMes) : "—",
+      valor: isFinite(medio.inv) ? brl(medio.inv) : "—",
+      faixa: faixaBrl(otimista.inv, pessimista.inv),
       cor: "text-foreground",
       destaque: false,
     },
     {
       label: "Alcance orgânico",
-      valor: isFinite(alcanceMes) ? `${num(alcanceMes)} pessoas` : "—",
+      valor: isFinite(medio.alc) ? `${num(medio.alc)} pessoas` : "—",
+      faixa: faixaNum(otimista.alc, pessimista.alc),
       cor: "text-foreground",
       destaque: false,
     },
   ];
   return (
-    <div className="fixed bottom-0 inset-x-0 z-20 border-t-2 border-primary/40 bg-card/95 backdrop-blur shadow-[0_-4px_16px_rgba(0,0,0,0.15)]">
-      <div className="max-w-5xl mx-auto grid grid-cols-3 sm:grid-cols-6 gap-1.5 px-2 sm:px-6 py-2 sm:py-2.5">
-        {itens.map((i) => (
-          <div
-            key={i.label}
-            className={`text-center min-w-0 rounded-md py-1 ${
-              i.destaque ? "bg-[color:var(--color-success)]/10" : ""
-            }`}
-          >
-            <div className="text-[9px] sm:text-[10px] uppercase tracking-wide text-muted-foreground truncate">
-              {i.label}
-            </div>
-            {/* key={valor} remonta o span quando o valor muda e replay a
-                animação — é o "senti que mexeu" da barra */}
+    <div className="fixed bottom-0 inset-x-0 z-20 border-t-2 border-primary/40 bg-card/95 backdrop-blur shadow-[0_-6px_24px_rgba(0,0,0,0.2)]">
+      <div className="max-w-5xl mx-auto px-2 sm:px-6">
+        <div className="text-center text-[9px] sm:text-[10px] text-muted-foreground pt-1.5 uppercase tracking-widest">
+          Seu resultado · número grande = cenário médio · faixa = do otimista ao pessimista (CAC e
+          conversão)
+        </div>
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 py-2 sm:py-3">
+          {itens.map((i) => (
             <div
-              key={i.valor}
-              className={`font-display text-sm sm:text-xl leading-tight truncate value-flash ${i.cor}`}
+              key={i.label}
+              className={`text-center min-w-0 rounded-lg py-1.5 sm:py-2 ${
+                i.destaque
+                  ? "bg-[color:var(--color-success)]/10 ring-1 ring-[color:var(--color-success)]/40"
+                  : ""
+              }`}
             >
-              {i.valor}
+              <div className="text-[9px] sm:text-[11px] uppercase tracking-wide text-muted-foreground truncate">
+                {i.label}
+              </div>
+              {/* key={valor} remonta o elemento quando o valor muda e replay
+                  a animação — é o "senti que mexeu" do painel */}
+              <div
+                key={i.valor}
+                className={`font-display text-base sm:text-3xl leading-tight truncate value-flash ${i.cor}`}
+              >
+                {i.valor}
+              </div>
+              <div
+                key={`faixa-${i.faixa}`}
+                className="text-[8px] sm:text-[11px] text-muted-foreground truncate value-flash"
+                title="Do cenário otimista (CAC mínimo, conversão máxima) ao pessimista (CAC máximo, conversão mínima)"
+              >
+                {i.faixa}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
       {margemEfetiva <= 0 && (
         <div className="bg-destructive text-destructive-foreground text-center text-[11px] py-1">
