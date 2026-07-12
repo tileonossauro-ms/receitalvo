@@ -190,8 +190,16 @@ function Index() {
   const trocarNicho = (novoId: string) => {
     if (novoId === state.nichoId) return;
     const defaults = makeDefaults(getPreset(state.nichoId));
-    const isCustomized = JSON.stringify({ ...state, nichoId: "x" }) !==
-      JSON.stringify({ ...defaults, nichoId: "x" });
+    // Ignora os ids dos vendedores na comparação: makeDefaults gera um UUID
+    // novo a cada chamada, o que fazia o modal de "valores customizados"
+    // aparecer pra todo mundo, mesmo sem nenhuma mudança.
+    const canonico = (s: State) =>
+      JSON.stringify({
+        ...s,
+        nichoId: "x",
+        vendedores: s.vendedores.map(({ id: _id, ...v }) => v),
+      });
+    const isCustomized = canonico(state) !== canonico(defaults);
     // Sempre salva o estado atual antes de trocar
     try {
       localStorage.setItem(stateKey(state.nichoId), JSON.stringify(state));
@@ -264,23 +272,29 @@ function Index() {
     });
   }, [state.meses, state.metaLucro, margem, state.cacMin, state.cacMax, state.convMin, state.convMax, custosFixos]);
 
+  // Capacidade normalizada pro mês: presets com período "dia" (açaí, auto
+  // center, quiosque) informam capacidade diária — a meta é mensal, então a
+  // comparação precisa ser feita na mesma unidade de tempo.
+  const capacidadeMes =
+    preset.capacidade.periodo === "dia" ? state.capacidade * state.diasVenda : state.capacidade;
+
   const capacidadeCalc = useMemo(() => {
     return faixaTickets.map((p) => {
       const custoP = (p * custoVarPct) / 100;
       const marg = p - custoP;
       const necessarias = marg > 0 ? Math.ceil(metaEfetiva / marg) : Infinity;
-      const suficiente = state.capacidade >= necessarias;
-      const lucroMaxBruto = state.capacidade * marg - custosFixos;
+      const suficiente = capacidadeMes >= necessarias;
+      const lucroMaxBruto = capacidadeMes * marg - custosFixos;
       const lucroMax = suficiente ? state.metaLucro : Math.max(0, lucroMaxBruto);
       const precoMin =
-        state.capacidade > 0 ? metaEfetiva / (state.capacidade * (1 - custoVarPct / 100)) : Infinity;
+        capacidadeMes > 0 ? metaEfetiva / (capacidadeMes * (1 - custoVarPct / 100)) : Infinity;
       return { preco: p, marg, necessarias, suficiente, lucroMax, precoMin };
     });
-  }, [faixaTickets, custoVarPct, metaEfetiva, state.capacidade, custosFixos]);
+  }, [faixaTickets, custoVarPct, metaEfetiva, capacidadeMes, custosFixos, state.metaLucro]);
 
   const recomendacao = useMemo(() => {
     const viaveis = capacidadeCalc.filter((c) => c.marg > 0 && c.suficiente).sort((a, b) => a.preco - b.preco);
-    const comFolga = viaveis.find((c) => state.capacidade >= c.necessarias * 1.15);
+    const comFolga = viaveis.find((c) => capacidadeMes >= c.necessarias * 1.15);
     if (comFolga)
       return {
         preco: comFolga.preco,
@@ -298,7 +312,7 @@ function Index() {
       tipo: "impossivel" as const,
       motivo: "nenhum ticket da faixa cabe nessa capacidade. Aumente a capacidade ou suba o ticket médio.",
     };
-  }, [capacidadeCalc, state.capacidade]);
+  }, [capacidadeCalc, capacidadeMes]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -443,6 +457,12 @@ function Index() {
                 onChange={(e) => patch({ capacidade: +e.target.value })}
                 className="w-full accent-[color:var(--color-primary)]"
               />
+              {preset.capacidade.periodo === "dia" && (
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  = <strong className="text-foreground">{num(capacidadeMes)}</strong> por mês,
+                  considerando {state.diasVenda} dias de venda (ajuste os dias na aba Plano do mês).
+                </p>
+              )}
             </div>
 
             <LucroChart
