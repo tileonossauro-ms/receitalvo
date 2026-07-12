@@ -83,20 +83,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Ferramenta multi-nicho de planejamento de meta mensal: capacidade, equipe, ranking por valor esperado por lead e simulador de realocação.",
       },
-      { property: "og:title", content: "Planejador de Receita" },
+      { property: "og:title", content: "Planejador de Receita — meta mensal para pequenos negócios" },
       {
         property: "og:description",
         content:
-          "Planeje meta, capacidade e realocação de leads da sua equipe. 7 nichos, presets editáveis, tudo no navegador.",
+          "Ferramenta multi-nicho de planejamento de meta mensal: capacidade, equipe, ranking por valor esperado por lead e simulador de realocação.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Planejador de Receita" },
+      { name: "twitter:title", content: "Planejador de Receita — meta mensal para pequenos negócios" },
       {
         name: "twitter:description",
         content:
-          "Planeje meta, capacidade e realocação de leads da sua equipe. 7 nichos, presets editáveis.",
+          "Ferramenta multi-nicho de planejamento de meta mensal: capacidade, equipe, ranking por valor esperado por lead e simulador de realocação.",
       },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/29207f9f-9b54-4f4b-8e6a-6c8a8efa104b" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/29207f9f-9b54-4f4b-8e6a-6c8a8efa104b" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
