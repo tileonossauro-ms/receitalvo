@@ -267,3 +267,29 @@ export const PRESETS: Preset[] = [
 
 export const getPreset = (id: string): Preset =>
   PRESETS.find((p) => p.id === id) ?? PRESETS[0];
+
+// ---------------------------------------------------------------------------
+// Custo de contratação CLT — dados de fonte legal (não são estimativa).
+//
+// Salário mínimo nacional 2026: R$ 1.621,00 (Decreto nº 12.797/2025).
+// É só o piso nacional — o salário real da vaga varia por função e região,
+// por isso o campo é editável e o default é o mínimo.
+export const SALARIO_MINIMO_2026 = 1621;
+
+// Encargos sobre o salário para empresa do SIMPLES NACIONAL (o regime de
+// praticamente todo pequeno negócio destes nichos):
+//   FGTS ................................ 8,00%
+//   Provisão de 13º salário (1/12) ...... 8,33%
+//   Provisão de férias + 1/3 ........... 11,11%
+//   Provisão de multa rescisória FGTS ... 4,00%
+//   Total ............................. ~31,44%
+// No Simples NÃO existe INSS patronal à parte (os 20% já estão embutidos na
+// guia DAS). Empresa fora do Simples (Lucro Presumido/Real) paga
+// +~28,8 p.p. de INSS patronal + RAT/terceiros — o card avisa isso.
+export const ENCARGOS_SIMPLES_PCT = 31.44;
+export const ENCARGOS_BREAKDOWN = [
+  { nome: "FGTS", pct: 8 },
+  { nome: "Provisão de 13º salário (1/12)", pct: 8.33 },
+  { nome: "Provisão de férias + 1/3", pct: 11.11 },
+  { nome: "Provisão de multa rescisória do FGTS", pct: 4 },
+];

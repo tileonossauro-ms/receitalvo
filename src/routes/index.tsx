@@ -1,6 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { PRESETS, getPreset, type Preset, type MixItem, type Especialidade } from "@/lib/presets";
+import {
+  PRESETS,
+  getPreset,
+  SALARIO_MINIMO_2026,
+  ENCARGOS_SIMPLES_PCT,
+  ENCARGOS_BREAKDOWN,
+  type Preset,
+  type MixItem,
+  type Especialidade,
+} from "@/lib/presets";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -47,6 +56,9 @@ type State = {
   meses: Mes[];
   // Equipe
   vendedores: Vendedor[];
+  // Simulador de contratação
+  funcSalario: number;
+  funcOutrosCustos: number;
   // Blocos específicos por nicho
   mixReceita: MixItem[];
   especialidades: Especialidade[];
@@ -93,6 +105,8 @@ function makeDefaults(p: Preset): State {
         ticketMedioAtual: p.ticketInicial,
       },
     ],
+    funcSalario: SALARIO_MINIMO_2026,
+    funcOutrosCustos: 0,
     mixReceita: p.mixReceita ? p.mixReceita.map((m) => ({ ...m })) : [],
     especialidades: p.especialidades ? p.especialidades.map((e) => ({ ...e })) : [],
     produtoGuiaNome: p.produtoGuia?.nome ?? "",
@@ -107,6 +121,14 @@ const brl = (v: number) =>
     ? v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 })
     : "—";
 const num = (v: number) => (isFinite(v) ? Math.ceil(v).toLocaleString("pt-BR") : "—");
+
+// Ancoragem psicológica de preço: menor valor com final 9,90 que seja MAIOR
+// ou igual ao preço — sempre pra cima, nunca desconto disfarçado.
+// Ex.: 53 → 59,90 · 27 → 29,90 · 120 → 129,90 · 1.100 → 1.109,90
+const ancorar = (p: number) => {
+  const cand = Math.floor(p / 10) * 10 + 9.9;
+  return Math.round((cand < p ? cand + 10 : cand) * 100) / 100;
+};
 
 function useHydrated() {
   const [h, setH] = useState(false);
@@ -132,6 +154,7 @@ function Index() {
   const [dark, setDark] = useState(true);
   const [tab, setTab] = useState<"meta" | "parametros" | "capacidade" | "equipe" | "plano">("meta");
   const [nichoPendente, setNichoPendente] = useState<string | null>(null);
+  const [capaAberta, setCapaAberta] = useState(false);
 
   const preset = useMemo(() => getPreset(state.nichoId), [state.nichoId]);
 
@@ -143,10 +166,20 @@ function Index() {
       setState(loadState(ativo));
       const t = localStorage.getItem(THEME_KEY);
       setDark(t ? t === "dark" : true);
+      if (!localStorage.getItem("planner-capa-vista")) setCapaAberta(true);
     } catch {
       /* ignore */
     }
   }, []);
+
+  const fecharCapa = () => {
+    setCapaAberta(false);
+    try {
+      localStorage.setItem("planner-capa-vista", "1");
+    } catch {
+      /* ignore */
+    }
+  };
 
   // Persistência do estado por nicho
   useEffect(() => {
@@ -250,11 +283,14 @@ function Index() {
   const metaEfetiva = state.metaLucro + custosFixos;
   const margem = state.ticketMedio - custoUnitario;
 
-  // Faixa de tickets para o PriceBar / Capacidade
+  // Faixa de tickets para o PriceBar / Capacidade.
+  // Os candidatos são ancorados em final 9,90 (regra da casa: sempre pra
+  // cima); o ticket atual do usuário entra exato pra manter a seleção.
   const faixaTickets = useMemo(() => {
     const base = state.ticketMedio;
     const mults = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3];
-    return mults.map((m) => Math.round(base * m));
+    const set = new Set<number>([base, ...mults.map((m) => ancorar(base * m))]);
+    return [...set].sort((a, b) => a - b);
   }, [state.ticketMedio]);
 
   const mesesCalc = useMemo(() => {
@@ -292,27 +328,43 @@ function Index() {
     });
   }, [faixaTickets, custoVarPct, metaEfetiva, capacidadeMes, custosFixos, state.metaLucro]);
 
+  // Recomendação de ticket. Regra da casa: nunca sugerir baixar o preço —
+  // se o ticket atual entrega a meta dentro da capacidade, mantenha; se não
+  // entrega, a saída é subir o ticket (ancorado em 9,90) ou a capacidade.
   const recomendacao = useMemo(() => {
-    const viaveis = capacidadeCalc.filter((c) => c.marg > 0 && c.suficiente).sort((a, b) => a.preco - b.preco);
-    const comFolga = viaveis.find((c) => capacidadeMes >= c.necessarias * 1.15);
-    if (comFolga)
+    const atual = capacidadeCalc.find((c) => c.preco === state.ticketMedio);
+    if (atual && atual.marg > 0 && atual.suficiente) {
+      const temFolga = capacidadeMes >= atual.necessarias * 1.15;
+      return temFolga
+        ? {
+            preco: state.ticketMedio,
+            tipo: "folga" as const,
+            frase: `Seu ticket de ${brl(state.ticketMedio)} entrega a meta dentro da capacidade, com folga de ~15% pra imprevistos. Pode manter.`,
+          }
+        : {
+            preco: state.ticketMedio,
+            tipo: "apertado" as const,
+            frase: `Seu ticket de ${brl(state.ticketMedio)} cabe na capacidade, mas sem folga — uma venda perdida já derruba a meta. Subir o ticket dá mais segurança.`,
+          };
+    }
+    const maioresViaveis = capacidadeCalc
+      .filter((c) => c.marg > 0 && c.suficiente && c.preco > state.ticketMedio)
+      .sort((a, b) => a.preco - b.preco);
+    const comFolga = maioresViaveis.find((c) => capacidadeMes >= c.necessarias * 1.15);
+    const escolhido = comFolga ?? maioresViaveis[0];
+    if (escolhido)
       return {
-        preco: comFolga.preco,
-        tipo: "folga" as const,
-        motivo: "menor ticket que cabe na sua capacidade com folga de ~15% pra imprevistos.",
-      };
-    if (viaveis[0])
-      return {
-        preco: viaveis[0].preco,
-        tipo: "apertado" as const,
-        motivo: "menor ticket que ainda cabe na capacidade, mas sem folga. Uma venda perdida já derruba a meta.",
+        preco: escolhido.preco,
+        tipo: "subir" as const,
+        frase: `No ticket atual a meta não cabe na sua capacidade. Subindo pra ${brl(escolhido.preco)}, cabe${comFolga ? " com folga de ~15%" : ", mas sem folga"}.`,
       };
     return {
       preco: null,
       tipo: "impossivel" as const,
-      motivo: "nenhum ticket da faixa cabe nessa capacidade. Aumente a capacidade ou suba o ticket médio.",
+      frase:
+        "Nenhum ticket da faixa entrega a meta dentro dessa capacidade. Aumente a capacidade (mais gente, mais horário) ou revise a meta.",
     };
-  }, [capacidadeCalc, capacidadeMes]);
+  }, [capacidadeCalc, capacidadeMes, state.ticketMedio]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -332,6 +384,13 @@ function Index() {
               className="mt-1 text-[11px] sm:text-xs bg-transparent border-b border-dashed border-border focus:border-primary outline-none w-full max-w-[220px] text-muted-foreground focus:text-foreground"
             />
           </div>
+          <button
+            onClick={() => setCapaAberta(true)}
+            className="text-xs px-2.5 py-1.5 rounded-md border border-border hover:bg-secondary transition"
+            aria-label="Como usar a calculadora"
+          >
+            ❔ Como usar
+          </button>
           <button
             onClick={() => setDark((d) => !d)}
             className="text-xs px-2.5 py-1.5 rounded-md border border-border hover:bg-secondary transition"
@@ -381,7 +440,7 @@ function Index() {
         </nav>
       </header>
 
-      <main className="max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4">
+      <main className="max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-24 space-y-4">
         {preset.avisoConfianca && (
           <div className="rounded-lg border border-[color:var(--color-warning)]/60 bg-[color:var(--color-warning)]/15 p-3 text-xs sm:text-sm">
             <div className="flex items-start gap-2">
@@ -402,6 +461,7 @@ function Index() {
             patch={patch}
             preset={preset}
             custosFixos={custosFixos}
+            custoVarPct={custoVarPct}
             margem={margem}
             metaEfetiva={metaEfetiva}
             recomendacao={recomendacao}
@@ -516,8 +576,6 @@ function Index() {
             </div>
             <RecomendacaoCard
               recomendacao={recomendacao}
-              capacidade={state.capacidade}
-              unidade={preset.capacidade.unidade}
               onUsar={(p) => patch({ ticketMedio: p })}
             />
           </SectionCard>
@@ -529,6 +587,8 @@ function Index() {
             patch={patch}
             preset={preset}
             metaEfetiva={metaEfetiva}
+            margem={margem}
+            capacidadeMes={capacidadeMes}
           />
         )}
 
@@ -641,6 +701,18 @@ function Index() {
         <FormulasCard unidade={preset.rotulos.unidadeVenda} />
       </main>
 
+      <ResumoBar
+        metaLucro={state.metaLucro}
+        custosFixos={custosFixos}
+        ticket={state.ticketMedio}
+        custoUnitario={custoUnitario}
+        margem={margem}
+        metaEfetiva={metaEfetiva}
+        unidade={preset.rotulos.unidadeVenda}
+      />
+
+      {capaAberta && <CapaModal onFechar={fecharCapa} />}
+
       {nichoPendente && (
         <TrocaNichoModal
           de={preset.nome}
@@ -654,6 +726,149 @@ function Index() {
 }
 
 /* =========================================================================
+   Resumo fixo — Receita · Despesas · No bolso, visível em todas as abas
+   ========================================================================= */
+
+function ResumoBar({
+  metaLucro,
+  custosFixos,
+  ticket,
+  custoUnitario,
+  margem,
+  metaEfetiva,
+  unidade,
+}: {
+  metaLucro: number;
+  custosFixos: number;
+  ticket: number;
+  custoUnitario: number;
+  margem: number;
+  metaEfetiva: number;
+  unidade: string;
+}) {
+  const unidades = margem > 0 ? Math.ceil(metaEfetiva / margem) : Infinity;
+  const receita = isFinite(unidades) ? unidades * ticket : Infinity;
+  const despesas = isFinite(unidades) ? custosFixos + unidades * custoUnitario : Infinity;
+  const bolso = isFinite(receita) ? receita - despesas : -Infinity;
+  const itens = [
+    {
+      label: "Receita/mês",
+      valor: brl(receita),
+      cor: "text-primary",
+    },
+    {
+      label: "Despesas/mês",
+      valor: isFinite(despesas) ? `− ${brl(despesas)}` : "—",
+      cor: "text-destructive",
+    },
+    {
+      label: "No seu bolso",
+      valor: isFinite(bolso) ? brl(bolso) : "—",
+      cor: "text-[color:var(--color-success)]",
+    },
+    {
+      label: "Vendas p/ meta",
+      valor: isFinite(unidades) ? `${num(unidades)} ${unidade}s` : "—",
+      cor: "text-foreground",
+    },
+  ];
+  return (
+    <div className="fixed bottom-0 inset-x-0 z-20 border-t border-border bg-card/95 backdrop-blur">
+      <div className="max-w-5xl mx-auto grid grid-cols-4 gap-1 px-2 sm:px-6 py-1.5">
+        {itens.map((i) => (
+          <div key={i.label} className="text-center min-w-0">
+            <div className="text-[9px] sm:text-[10px] uppercase tracking-wide text-muted-foreground truncate">
+              {i.label}
+            </div>
+            <div className={`font-display text-xs sm:text-base leading-tight truncate ${i.cor}`}>
+              {i.valor}
+            </div>
+          </div>
+        ))}
+      </div>
+      {margem <= 0 && (
+        <div className="bg-destructive text-destructive-foreground text-center text-[11px] py-0.5">
+          ⚠️ Seus custos variáveis são maiores que o ticket — nenhuma venda dá lucro assim.
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* =========================================================================
+   Capa — como usar a calculadora
+   ========================================================================= */
+
+function CapaModal({ onFechar }: { onFechar: () => void }) {
+  const passos = [
+    {
+      emoji: "1️⃣",
+      titulo: "Escolha o seu nicho",
+      texto:
+        "Lá em cima, toque no tipo do seu negócio. A calculadora já carrega as médias de mercado daquele setor pra você não começar do zero.",
+    },
+    {
+      emoji: "2️⃣",
+      titulo: "Diga quanto quer NO BOLSO",
+      texto:
+        "Na aba 🎯 Meta, informe o lucro que você quer que sobre por mês — depois de pagar tudo. A ferramenta mostra na hora quantas vendas isso exige.",
+    },
+    {
+      emoji: "3️⃣",
+      titulo: "Coloque os SEUS números",
+      texto:
+        "Seu preço (ticket médio), seus custos fixos e variáveis, sua capacidade. Quanto mais real, mais confiável o plano. Campos de RECEITA e DESPESA estão sempre identificados.",
+    },
+    {
+      emoji: "4️⃣",
+      titulo: "Acompanhe a barra lá embaixo",
+      texto:
+        "Em qualquer aba, a barra fixa no rodapé mostra Receita, Despesas e o que sobra no bolso — ela reage em tempo real a tudo que você preencher.",
+    },
+  ];
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="max-w-lg w-full rounded-xl border border-border bg-card p-5 shadow-xl my-auto">
+        <div className="w-11 h-11 rounded-md ember-gradient flex items-center justify-center text-2xl mb-3">
+          📈
+        </div>
+        <h2 className="font-display text-2xl tracking-wide leading-tight mb-1">
+          PLANEJADOR <span className="ember-text">DE RECEITA</span>
+        </h2>
+        <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+          Essa calculadora responde uma pergunta só:{" "}
+          <strong className="text-foreground">
+            o que precisa acontecer no seu negócio pra sobrar o dinheiro que você quer no bolso?
+          </strong>{" "}
+          Sem planilha, sem contabilês.
+        </p>
+        <div className="space-y-3 mb-4">
+          {passos.map((p) => (
+            <div key={p.titulo} className="flex gap-3">
+              <span className="text-lg leading-none">{p.emoji}</span>
+              <div>
+                <div className="text-sm font-semibold">{p.titulo}</div>
+                <p className="text-xs text-muted-foreground leading-relaxed">{p.texto}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] text-muted-foreground leading-relaxed mb-4">
+          ⚠️ As médias de mercado são pontos de partida honestos — onde a fonte não é confiável,
+          você verá um aviso amarelo. Os números que valem são sempre os seus.
+        </p>
+        <button
+          onClick={onFechar}
+          className="w-full rounded-md bg-primary text-primary-foreground font-semibold py-2.5 text-sm hover:opacity-90 transition"
+        >
+          Começar 🚀
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
    AJUSTES TAB — parâmetros do nicho + blocos específicos
    ========================================================================= */
 
@@ -662,6 +877,7 @@ function MetaGuiadaTab({
   patch,
   preset,
   custosFixos,
+  custoVarPct,
   margem,
   metaEfetiva,
   recomendacao,
@@ -671,21 +887,21 @@ function MetaGuiadaTab({
   patch: (p: Partial<State>) => void;
   preset: Preset;
   custosFixos: number;
+  custoVarPct: number;
   margem: number;
   metaEfetiva: number;
   recomendacao: {
     preco: number | null;
-    tipo: "folga" | "apertado" | "impossivel";
-    motivo: string;
+    tipo: "folga" | "apertado" | "subir" | "impossivel";
+    frase: string;
   };
   setTab: (t: "meta" | "parametros" | "capacidade" | "equipe" | "plano") => void;
 }) {
-  const [comparando, setComparando] = useState(false);
   const unidade = preset.rotulos.unidadeVenda;
   const plural = (n: number, s: string) => `${s}${n === 1 ? "" : "s"}`;
 
   // Cenário "mercado": só o ticket e a estrutura de custo do preset, sem
-  // nenhuma customização do usuário — é o caminho ilustrativo com médias.
+  // nenhuma customização do usuário — é a referência, não o protagonista.
   const custoVarMercado =
     preset.estruturaCusto.comissaoPct +
     preset.estruturaCusto.cmvPct +
@@ -694,12 +910,25 @@ function MetaGuiadaTab({
   const margemMercado = preset.ticketInicial * (1 - custoVarMercado / 100);
   const unidadesMercado =
     margemMercado > 0 ? Math.ceil(state.metaLucro / margemMercado) : Infinity;
-  const unidadesMercadoDia = isFinite(unidadesMercado) ? Math.ceil(unidadesMercado / 30) : Infinity;
 
-  // Cenário "seu negócio": usa os valores já customizados em `state`
-  // (margem e metaEfetiva já vêm calculados lá de cima, no Index()).
+  // Cenário "seu negócio": o protagonista. Usa ticket, custos fixos e
+  // variáveis do usuário — o número grande é sempre este.
   const unidadesReal = margem > 0 ? Math.ceil(metaEfetiva / margem) : Infinity;
-  const unidadesRealDia = isFinite(unidadesReal) ? Math.ceil(unidadesReal / 30) : Infinity;
+  const unidadesRealDia = isFinite(unidadesReal)
+    ? Math.ceil(unidadesReal / state.diasVenda)
+    : Infinity;
+  const semCustos = custosFixos === 0 && custoVarPct === 0;
+
+  // Ancoragem 9,90 (sempre pra cima) e o ganho que ela traz
+  const precoAncorado = ancorar(state.ticketMedio);
+  const margemAncorada = precoAncorado * (1 - custoVarPct / 100);
+  const unidadesAncorado =
+    margemAncorada > 0 ? Math.ceil(metaEfetiva / margemAncorada) : Infinity;
+  const ganhoAncoragemMes =
+    isFinite(unidadesReal) && margem > 0
+      ? unidadesReal * (margemAncorada - margem)
+      : 0;
+  const jaAncorado = precoAncorado - state.ticketMedio < 0.05;
 
   let fraseComparativa = "Ajuste o ticket médio pra ver a comparação.";
   if (isFinite(unidadesReal) && isFinite(unidadesMercado)) {
@@ -730,8 +959,8 @@ function MetaGuiadaTab({
   return (
     <div className="space-y-4">
       <SectionCard
-        title="🎯 Qual é a sua meta?"
-        help="Só isso. A partir daqui, a gente calcula o caminho — você não precisa preencher mais nada pra ver o primeiro resultado."
+        title="🎯 Quanto você quer NO BOLSO por mês?"
+        help="Lucro líquido: o que sobra depois de pagar TODAS as despesas. A partir daqui a gente calcula o caminho — e cada custo que você lançar deixa esse caminho mais real."
       >
         <div className="flex flex-wrap gap-2 mb-3">
           {[1000, 2000, 3000, 5000].map((v) => (
@@ -759,92 +988,166 @@ function MetaGuiadaTab({
         </div>
       </SectionCard>
 
-      <div className="rounded-xl border border-border bg-card p-4 sm:p-6 text-center">
-        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">
-          Com o {unidade} médio de mercado ({brl(preset.ticketInicial)})
+      <SectionCard
+        title="📊 Seus números"
+        help={`Mexa aqui e veja o resultado mudar na hora. Faixa de mercado do ticket: ${brl(preset.ticketMin)} – ${brl(preset.ticketMax)}.`}
+      >
+        <div className="grid grid-cols-2 gap-3">
+          <NumberField
+            label="Seu ticket médio (receita)"
+            value={state.ticketMedio}
+            prefix="R$"
+            onChange={(v) => patch({ ticketMedio: v })}
+          />
+          <NumberField
+            label={`Sua capacidade (${preset.capacidade.unidade})`}
+            value={state.capacidade}
+            onChange={(v) => patch({ capacidade: v })}
+          />
         </div>
-        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-          Pra bater <strong className="text-foreground">{brl(state.metaLucro)}</strong> de lucro
-          por mês, você precisa vender
+        <p className="text-xs text-muted-foreground mt-2">
+          Comissão, CMV, aluguel e custos fixos ficam na aba{" "}
+          <button
+            onClick={() => setTab("parametros")}
+            className="text-primary underline underline-offset-2"
+          >
+            Ajustes
+          </button>{" "}
+          — tudo que você lançar lá já entra na conta abaixo.
         </p>
-        <div className="font-display text-4xl sm:text-5xl ember-text py-1.5">
-          {num(unidadesMercado)} {plural(unidadesMercado, unidade)}/mês
+      </SectionCard>
+
+      {/* O número grande — sempre com os dados DO USUÁRIO */}
+      <div className="rounded-xl border-2 border-primary/50 bg-card p-4 sm:p-6 text-center">
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">
+          O seu negócio · ticket de {brl(state.ticketMedio)}
         </div>
-        <p className="text-sm text-muted-foreground">(~{num(unidadesMercadoDia)} por dia)</p>
+        {margem > 0 ? (
+          <>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              Pra sobrar <strong className="text-foreground">{brl(state.metaLucro)}</strong> no seu
+              bolso, você precisa vender
+            </p>
+            <div className="font-display text-4xl sm:text-5xl ember-text py-1.5">
+              {num(unidadesReal)} {plural(unidadesReal, unidade)}/mês
+            </div>
+            <p className="text-sm text-muted-foreground">
+              (~{num(unidadesRealDia)} por dia, em {state.diasVenda} dias de venda)
+            </p>
+            {semCustos ? (
+              <p className="text-xs rounded-lg border border-[color:var(--color-warning)]/60 bg-[color:var(--color-warning)]/10 p-2.5 mt-3 leading-relaxed">
+                ⚠️ Você ainda não lançou nenhum custo — esse número está otimista demais. Cadastre
+                suas despesas na aba{" "}
+                <button
+                  onClick={() => setTab("parametros")}
+                  className="underline underline-offset-2 font-semibold"
+                >
+                  Ajustes
+                </button>{" "}
+                pra ver quanto realmente precisa vender.
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground mt-3">
+                ✓ Já descontando{" "}
+                {[
+                  custosFixos > 0 ? `${brl(custosFixos)} de despesas fixas` : null,
+                  custoVarPct > 0
+                    ? `${custoVarPct.toFixed(1).replace(".", ",")}% de custos variáveis por venda`
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(" e ")}
+                . Sobra de verdade.
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="text-sm text-destructive leading-relaxed py-4">
+            ⚠️ Seus custos variáveis somam {custoVarPct.toFixed(1)}% do ticket — nenhuma venda
+            deixa dinheiro no bolso assim. Revise seus custos na aba Ajustes ou suba o ticket.
+          </p>
+        )}
       </div>
 
-      <button
-        onClick={() => setComparando((c) => !c)}
-        className="w-full rounded-xl border border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10 transition p-3 text-sm font-medium text-primary flex items-center justify-center gap-2 text-center"
-      >
-        <span>{comparando ? "▲" : "▼"}</span>
-        Esses números são a média do mercado. Quer ver com os seus números reais?
-      </button>
-
-      {comparando && (
-        <div className="rounded-xl border border-border bg-card p-4 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <NumberField
-              label="Seu ticket médio"
-              value={state.ticketMedio}
-              prefix="R$"
-              onChange={(v) => patch({ ticketMedio: v })}
-            />
-            <NumberField
-              label={`Sua capacidade (${preset.capacidade.unidade})`}
-              value={state.capacidade}
-              onChange={(v) => patch({ capacidade: v })}
-            />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Quer refinar comissão, CMV, aluguel e outros custos fixos com mais detalhe? Isso fica na
-            aba{" "}
-            <button
-              onClick={() => setTab("parametros")}
-              className="text-primary underline underline-offset-2"
-            >
-              Ajustes
-            </button>
-            .
-          </p>
-
-          <div className="overflow-x-auto -mx-4 sm:mx-0">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left border-b border-border text-muted-foreground text-xs">
-                  <th className="p-2"></th>
-                  <th className="p-2">Mercado (padrão)</th>
-                  <th className="p-2">O seu negócio</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-border">
-                  <td className="p-2 text-muted-foreground">Ticket médio</td>
-                  <td className="p-2">{brl(preset.ticketInicial)}</td>
-                  <td className="p-2 font-semibold">{brl(state.ticketMedio)}</td>
-                </tr>
-                <tr>
-                  <td className="p-2 text-muted-foreground capitalize">{unidade}s/mês necessário</td>
-                  <td className="p-2">{num(unidadesMercado)}</td>
-                  <td className="p-2 font-semibold">{num(unidadesReal)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p className="text-sm rounded-lg bg-secondary/60 p-3 leading-relaxed">{fraseComparativa}</p>
+      {/* Referência de mercado — secundária, sempre visível */}
+      <div className="rounded-xl border border-border bg-card p-4">
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-2">
+          Comparado com a média do mercado
         </div>
-      )}
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left border-b border-border text-muted-foreground text-xs">
+                <th className="p-2"></th>
+                <th className="p-2">Mercado (média)</th>
+                <th className="p-2 text-primary">O seu negócio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-border">
+                <td className="p-2 text-muted-foreground">Ticket médio</td>
+                <td className="p-2">{brl(preset.ticketInicial)}</td>
+                <td className="p-2 font-semibold">{brl(state.ticketMedio)}</td>
+              </tr>
+              <tr>
+                <td className="p-2 text-muted-foreground capitalize">{unidade}s/mês pra meta</td>
+                <td className="p-2">{num(unidadesMercado)}</td>
+                <td className="p-2 font-semibold">{num(unidadesReal)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="text-sm rounded-lg bg-secondary/60 p-3 mt-2 leading-relaxed">
+          {fraseComparativa}
+        </p>
+      </div>
+
+      {/* Ancoragem de preço 9,90 */}
+      {margem > 0 &&
+        (jaAncorado ? (
+          <div className="rounded-xl border border-[color:var(--color-success)]/50 bg-[color:var(--color-success)]/5 p-3 text-sm">
+            ✓ Seu preço já está ancorado em final 9,90 — padrão que o cliente percebe como mais
+            barato do que realmente é.
+          </div>
+        ) : (
+          <div className="rounded-xl border border-[color:var(--color-success)]/50 bg-[color:var(--color-success)]/5 p-4">
+            <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">
+              💰 Ancoragem de preço
+            </div>
+            <p className="text-sm leading-relaxed">
+              Em vez de {brl(state.ticketMedio)}, cobre{" "}
+              <strong className="text-[color:var(--color-success)]">{brl(precoAncorado)}</strong>.
+              Preço com final 9,90 é o padrão que o cliente já espera — e a diferença de{" "}
+              {brl(precoAncorado - state.ticketMedio)} por {unidade}, que ninguém sente, vira{" "}
+              <strong className="text-foreground">
+                +{brl(Math.max(0, ganhoAncoragemMes))}/mês de lucro
+              </strong>{" "}
+              nas mesmas vendas
+              {isFinite(unidadesAncorado) && isFinite(unidadesReal) && unidadesAncorado < unidadesReal && (
+                <>
+                  {" "}
+                  — ou sua meta cai de {num(unidadesReal)} pra{" "}
+                  <strong className="text-foreground">
+                    {num(unidadesAncorado)} {plural(unidadesAncorado, unidade)}/mês
+                  </strong>
+                </>
+              )}
+              .
+            </p>
+            <button
+              onClick={() => patch({ ticketMedio: precoAncorado })}
+              className="mt-2 text-xs px-3 py-1.5 rounded-md bg-[color:var(--color-success)] text-[color:var(--color-success-foreground)] font-semibold hover:opacity-90"
+            >
+              Usar {brl(precoAncorado)}
+            </button>
+          </div>
+        ))}
 
       <SectionCard
         title="📦 Isso cabe na sua capacidade?"
         help={`Sua capacidade hoje: ${state.capacidade} ${preset.capacidade.unidade}.`}
       >
-        <p className="text-sm leading-relaxed mb-3">
-          {recomendacao.tipo === "impossivel"
-            ? `Com o ticket em torno de ${brl(state.ticketMedio)}, ${recomendacao.motivo}`
-            : `O ticket de ${brl(recomendacao.preco ?? 0)} é o ${recomendacao.motivo}`}
-        </p>
+        <p className="text-sm leading-relaxed mb-3">{recomendacao.frase}</p>
         <button
           onClick={() => setTab("capacidade")}
           className="text-sm text-primary underline underline-offset-2"
@@ -864,6 +1167,42 @@ function MetaGuiadaTab({
           Ver plano mês a mês completo →
         </button>
       </SectionCard>
+    </div>
+  );
+}
+
+function GrupoHeader({
+  emoji,
+  titulo,
+  tipo,
+  extra,
+}: {
+  emoji: string;
+  titulo: string;
+  tipo: "receita" | "despesa" | "resultado" | "referencia";
+  extra?: ReactNode;
+}) {
+  const badge =
+    tipo === "receita"
+      ? { texto: "RECEITA", classe: "bg-[color:var(--color-success)]/15 text-[color:var(--color-success)] border-[color:var(--color-success)]/40" }
+      : tipo === "despesa"
+        ? { texto: "DESPESA", classe: "bg-destructive/10 text-destructive border-destructive/40" }
+        : tipo === "resultado"
+          ? { texto: "NO BOLSO", classe: "bg-primary/10 text-primary border-primary/40" }
+          : { texto: "REFERÊNCIA", classe: "bg-secondary text-muted-foreground border-border" };
+  return (
+    <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
+      <div className="flex items-center gap-2">
+        <h3 className="font-semibold">
+          {emoji} {titulo}
+        </h3>
+        <span
+          className={`text-[9px] font-bold tracking-widest px-1.5 py-0.5 rounded border ${badge.classe}`}
+        >
+          {badge.texto}
+        </span>
+      </div>
+      {extra}
     </div>
   );
 }
@@ -888,15 +1227,19 @@ function AjustesTab({
       title="Passo 1 · Ajustes"
       help={
         <>
-          Configure <strong>meta, estrutura de custo e benchmarks</strong> do seu negócio. Todos os
-          valores vieram do preset de <strong>{preset.nome}</strong> e podem ser alterados.
+          Configure <strong>meta, receitas e despesas</strong> do seu negócio. Todos os valores
+          vieram do preset de <strong>{preset.nome}</strong> e podem ser alterados. As etiquetas
+          mostram se cada campo é <strong>receita</strong>, <strong>despesa</strong> ou o{" "}
+          <strong>resultado</strong> que sobra pra você.
         </>
       }
     >
+      {/* Resultado desejado */}
+      <GrupoHeader emoji="🎯" titulo="Resultado desejado" tipo="resultado" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
         <SliderField
           label="Meta de lucro / mês"
-          hint="Quanto você quer sobrar no bolso"
+          hint="Quanto você quer que SOBRE, depois de pagar tudo"
           value={state.metaLucro}
           min={500}
           max={50000}
@@ -904,67 +1247,39 @@ function AjustesTab({
           prefix="R$"
           onChange={(v) => patch({ metaLucro: v })}
         />
-        <SliderField
-          label="Ticket médio"
-          hint={`Faixa do nicho: ${brl(preset.ticketMin)} – ${brl(preset.ticketMax)}`}
-          value={state.ticketMedio}
-          min={Math.round(preset.ticketMin * 0.5)}
-          max={Math.round(preset.ticketMax * 2)}
-          step={1}
-          prefix="R$"
-          onChange={(v) => patch({ ticketMedio: v })}
-        />
-        <SliderField
-          label="CAC mínimo"
-          hint="Custo por cliente pago (otimista)"
-          value={state.cacMin}
-          min={1}
-          max={200}
-          step={1}
-          prefix="R$"
-          onChange={(v) => patch({ cacMin: v })}
-        />
-        <SliderField
-          label="CAC máximo"
-          hint="Custo por cliente pago (pessimista)"
-          value={state.cacMax}
-          min={1}
-          max={200}
-          step={1}
-          prefix="R$"
-          onChange={(v) => patch({ cacMax: v })}
-        />
-        <SliderField
-          label="Conversão orgânica mín."
-          hint="% de quem vê e vira cliente (pior)"
-          value={state.convMin}
-          min={0.5}
-          max={15}
-          step={0.1}
-          suffix="%"
-          onChange={(v) => patch({ convMin: v })}
-        />
-        <SliderField
-          label="Conversão orgânica máx."
-          hint="% de quem vê e vira cliente (melhor)"
-          value={state.convMax}
-          min={0.5}
-          max={15}
-          step={0.1}
-          suffix="%"
-          onChange={(v) => patch({ convMax: v })}
-        />
       </div>
 
-      {/* Estrutura de custo */}
+      {/* Receita */}
       <div className="mt-6 pt-4 border-t border-border">
-        <div className="flex items-baseline justify-between mb-3">
-          <h3 className="font-semibold">Estrutura de custo variável</h3>
-          <span className="text-xs text-muted-foreground">
-            Total: <strong className="text-foreground">{custoVarPct.toFixed(1)}%</strong> do ticket
-            = <strong className="text-foreground">{brl(custoUnitario)}</strong> por {preset.rotulos.unidadeVenda}
-          </span>
+        <GrupoHeader emoji="💰" titulo="Receita" tipo="receita" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <SliderField
+            label="Ticket médio"
+            hint={`Quanto entra por ${preset.rotulos.unidadeVenda}. Faixa do nicho: ${brl(preset.ticketMin)} – ${brl(preset.ticketMax)}. Dica: finais 9,90 vendem mais.`}
+            value={state.ticketMedio}
+            min={Math.round(preset.ticketMin * 0.5)}
+            max={Math.round(preset.ticketMax * 2)}
+            step={1}
+            prefix="R$"
+            onChange={(v) => patch({ ticketMedio: v })}
+          />
         </div>
+      </div>
+
+      {/* Estrutura de custo variável */}
+      <div className="mt-6 pt-4 border-t border-border">
+        <GrupoHeader
+          emoji="💸"
+          titulo="Despesas variáveis (por venda)"
+          tipo="despesa"
+          extra={
+            <span className="text-xs text-muted-foreground">
+              Total: <strong className="text-foreground">{custoVarPct.toFixed(1)}%</strong> do
+              ticket = <strong className="text-foreground">{brl(custoUnitario)}</strong> por{" "}
+              {preset.rotulos.unidadeVenda}
+            </span>
+          }
+        />
         <p className="text-xs text-muted-foreground mb-3">
           Percentuais que saem de cada venda. A margem por {preset.rotulos.unidadeVenda} é ticket × (1 − total).
         </p>
@@ -1014,12 +1329,16 @@ function AjustesTab({
 
       {/* Custos fixos */}
       <div className="mt-6 pt-4 border-t border-border">
-        <div className="flex items-baseline justify-between mb-3">
-          <h3 className="font-semibold">Custos fixos do mês</h3>
-          <span className="text-xs text-muted-foreground">
-            Total: <strong className="text-foreground">{brl(custosFixos)}</strong>
-          </span>
-        </div>
+        <GrupoHeader
+          emoji="🏠"
+          titulo="Despesas fixas do mês"
+          tipo="despesa"
+          extra={
+            <span className="text-xs text-muted-foreground">
+              Total: <strong className="text-foreground">{brl(custosFixos)}</strong>
+            </span>
+          }
+        />
         <p className="text-xs text-muted-foreground mb-3">
           O que sai da conta todo mês, tenha ou não venda. Somamos à sua meta pra mostrar o número
           real de {preset.rotulos.unidadeVenda}s que você precisa vender.
@@ -1064,6 +1383,58 @@ function AjustesTab({
             step={100}
             prefix="R$"
             onChange={(v) => patch({ fixoOutros: v })}
+          />
+        </div>
+      </div>
+
+      {/* Benchmarks de marketing */}
+      <div className="mt-6 pt-4 border-t border-border">
+        <GrupoHeader emoji="📣" titulo="Marketing — benchmarks" tipo="referencia" />
+        <p className="text-xs text-muted-foreground mb-3">
+          Referências usadas pra estimar o investimento em anúncios e o alcance necessário. CAC =
+          quanto custa trazer 1 cliente pago. Conversão = a cada 100 pessoas alcançadas, quantas
+          compram.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <SliderField
+            label="CAC mínimo"
+            hint="Custo por cliente pago (otimista)"
+            value={state.cacMin}
+            min={1}
+            max={200}
+            step={1}
+            prefix="R$"
+            onChange={(v) => patch({ cacMin: v })}
+          />
+          <SliderField
+            label="CAC máximo"
+            hint="Custo por cliente pago (pessimista)"
+            value={state.cacMax}
+            min={1}
+            max={200}
+            step={1}
+            prefix="R$"
+            onChange={(v) => patch({ cacMax: v })}
+          />
+          <SliderField
+            label="Conversão orgânica mín."
+            hint="% de quem vê e vira cliente (pior)"
+            value={state.convMin}
+            min={0.5}
+            max={15}
+            step={0.1}
+            suffix="%"
+            onChange={(v) => patch({ convMin: v })}
+          />
+          <SliderField
+            label="Conversão orgânica máx."
+            hint="% de quem vê e vira cliente (melhor)"
+            value={state.convMax}
+            min={0.5}
+            max={15}
+            step={0.1}
+            suffix="%"
+            onChange={(v) => patch({ convMax: v })}
           />
         </div>
       </div>
@@ -1113,13 +1484,17 @@ function MixReceitaBlock({
     totalPct > 0 ? mix.reduce((s, i) => s + (i.pctReceita * i.margem) / totalPct, 0) : 0;
   return (
     <div className="mt-6 pt-4 border-t border-border">
-      <div className="flex items-baseline justify-between mb-2">
-        <h3 className="font-semibold">Mix de receita</h3>
-        <span className="text-xs text-muted-foreground">
-          Total: <strong className={totalPct === 100 ? "text-[color:var(--color-success)]" : "text-[color:var(--color-warning)]"}>{totalPct.toFixed(0)}%</strong>{" "}
-          · Margem média ponderada: <strong className="text-foreground">{margemMedia.toFixed(1)}%</strong>
-        </span>
-      </div>
+      <GrupoHeader
+        emoji="🧾"
+        titulo="Mix de receita"
+        tipo="receita"
+        extra={
+          <span className="text-xs text-muted-foreground">
+            Total: <strong className={totalPct === 100 ? "text-[color:var(--color-success)]" : "text-[color:var(--color-warning)]"}>{totalPct.toFixed(0)}%</strong>{" "}
+            · Margem média ponderada: <strong className="text-foreground">{margemMedia.toFixed(1)}%</strong>
+          </span>
+        }
+      />
       <div className="space-y-2">
         {mix.map((item, i) => (
           <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr] gap-2 items-center text-sm">
@@ -1168,10 +1543,16 @@ function EspecialidadesBlock({
 }) {
   return (
     <div className="mt-6 pt-4 border-t border-border">
-      <div className="flex items-baseline justify-between mb-2">
-        <h3 className="font-semibold">Especialidades</h3>
-        <span className="text-xs text-muted-foreground">Tickets iniciais idênticos — ajuste conforme sua realidade.</span>
-      </div>
+      <GrupoHeader
+        emoji="📋"
+        titulo="Especialidades"
+        tipo="receita"
+        extra={
+          <span className="text-xs text-muted-foreground">
+            Tickets iniciais idênticos — ajuste conforme sua realidade.
+          </span>
+        }
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
         {especialidades.map((esp, i) => (
           <div key={i} className="flex items-center gap-2 border border-input rounded-md p-2 bg-background">
@@ -1213,7 +1594,7 @@ function ProdutoGuiaBlock({
 }) {
   return (
     <div className="mt-6 pt-4 border-t border-border">
-      <h3 className="font-semibold mb-2">Produto guia + adicionais</h3>
+      <GrupoHeader emoji="⭐" titulo="Produto guia + adicionais" tipo="receita" />
       <p className="text-xs text-muted-foreground mb-3">
         Seu carro-chefe pauta a produção. Adicionais aumentam o ticket médio da venda.
       </p>
@@ -1285,11 +1666,15 @@ function EquipeTab({
   patch,
   preset,
   metaEfetiva,
+  margem,
+  capacidadeMes,
 }: {
   state: State;
   patch: (p: Partial<State>) => void;
   preset: Preset;
   metaEfetiva: number;
+  margem: number;
+  capacidadeMes: number;
 }) {
   const prof = preset.rotulos.profissional;
   const profCap = prof.charAt(0).toUpperCase() + prof.slice(1);
@@ -1493,7 +1878,201 @@ function EquipeTab({
           })}
         </div>
       </SectionCard>
+
+      <ContratacaoCard
+        state={state}
+        patch={patch}
+        preset={preset}
+        metaEfetiva={metaEfetiva}
+        margem={margem}
+        capacidadeMes={capacidadeMes}
+      />
     </div>
+  );
+}
+
+/* =========================================================================
+   Simulador de contratação — quando vale a pena contratar?
+   ========================================================================= */
+
+function ContratacaoCard({
+  state,
+  patch,
+  preset,
+  metaEfetiva,
+  margem,
+  capacidadeMes,
+}: {
+  state: State;
+  patch: (p: Partial<State>) => void;
+  preset: Preset;
+  metaEfetiva: number;
+  margem: number;
+  capacidadeMes: number;
+}) {
+  const unidade = preset.rotulos.unidadeVenda;
+  const prof = preset.rotulos.profissional;
+
+  // Custo real do funcionário (encargos do Simples são percentuais de lei —
+  // ver comentário em presets.ts)
+  const encargos = state.funcSalario * (ENCARGOS_SIMPLES_PCT / 100);
+  const custoTotal = state.funcSalario + encargos + state.funcOutrosCustos;
+
+  // Engenharia reversa: quantas vendas A MAIS pagam esse custo
+  const vendasExtra = margem > 0 ? Math.ceil(custoTotal / margem) : Infinity;
+  const vendasExtraDia = isFinite(vendasExtra)
+    ? Math.ceil(vendasExtra / state.diasVenda)
+    : Infinity;
+
+  // Contexto: quanto isso representa sobre o que já precisa ser vendido
+  const unidadesMeta = margem > 0 ? Math.ceil(metaEfetiva / margem) : Infinity;
+  const pctAumento =
+    isFinite(vendasExtra) && isFinite(unidadesMeta) && unidadesMeta > 0
+      ? (vendasExtra / unidadesMeta) * 100
+      : Infinity;
+
+  // Utilização da capacidade: vendas necessárias pra meta ÷ capacidade do mês
+  const utilizacao =
+    capacidadeMes > 0 && isFinite(unidadesMeta) ? (unidadesMeta / capacidadeMes) * 100 : 0;
+  const extrapolaCapacidade =
+    isFinite(vendasExtra) && isFinite(unidadesMeta)
+      ? unidadesMeta + vendasExtra > capacidadeMes
+      : false;
+
+  // Semáforo didático baseado na utilização da capacidade
+  const sinal =
+    utilizacao >= 85
+      ? {
+          emoji: "🟢",
+          titulo: "Bom momento pra considerar",
+          texto: `Pra bater sua meta você já usa ${utilizacao.toFixed(0)}% da sua capacidade. Perto do teto, crescer sem contratar (ou sem expandir estrutura) fica quase impossível — e recusar cliente é receita indo embora.`,
+          classe: "border-[color:var(--color-success)]/50 bg-[color:var(--color-success)]/5",
+        }
+      : utilizacao >= 60
+        ? {
+            emoji: "🟡",
+            titulo: "Zona de planejamento",
+            texto: `Sua meta usa ${utilizacao.toFixed(0)}% da capacidade. Ainda dá pra crescer com a estrutura atual, mas se a demanda continuar subindo, comece a planejar a contratação agora — contratar e treinar leva tempo.`,
+            classe: "border-[color:var(--color-warning)]/60 bg-[color:var(--color-warning)]/10",
+          }
+        : {
+            emoji: "⏸️",
+            titulo: "Ainda não precisa",
+            texto: `Sua meta usa só ${utilizacao.toFixed(0)}% da capacidade atual. Antes de adicionar custo fixo, o caminho mais barato é encher essa capacidade: mais divulgação, mais conversão, mais recorrência.`,
+            classe: "border-border bg-background",
+          };
+
+  return (
+    <SectionCard
+      title="💼 Quando vale a pena contratar?"
+      help={
+        <>
+          Simule o custo real de um novo {prof} (salário + encargos de lei) e veja{" "}
+          <strong>quantos {unidade}s a mais por mês</strong> ele precisa gerar pra se pagar.
+        </>
+      }
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+        <NumberField
+          label="Salário bruto / mês"
+          prefix="R$"
+          value={state.funcSalario}
+          onChange={(v) => patch({ funcSalario: v })}
+        />
+        <NumberField
+          label="Outros custos / mês"
+          prefix="R$"
+          value={state.funcOutrosCustos}
+          onChange={(v) => patch({ funcOutrosCustos: v })}
+        />
+        <div className="rounded-md border border-primary/40 bg-primary/5 p-2">
+          <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+            Custo total pra empresa
+          </div>
+          <div className="font-display text-lg text-primary">{brl(custoTotal)}</div>
+          <div className="text-[10px] text-muted-foreground">
+            salário + {ENCARGOS_SIMPLES_PCT.toFixed(2).replace(".", ",")}% de encargos + extras
+          </div>
+        </div>
+      </div>
+      <p className="text-[11px] text-muted-foreground mb-4">
+        O default é o salário mínimo nacional de 2026 (R$ 1.621 — Decreto 12.797/2025). Use o
+        salário real da vaga na sua região. Em "outros custos" entram vale-transporte,
+        alimentação, uniforme…
+      </p>
+
+      {/* O número principal — engenharia reversa */}
+      <div className="rounded-xl border border-border bg-background p-4 text-center mb-3">
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">
+          Pra esse {prof} se pagar, você precisa vender
+        </div>
+        <div className="font-display text-3xl sm:text-4xl ember-text py-1">
+          {isFinite(vendasExtra) ? `+${num(vendasExtra)} ${unidade}s/mês` : "—"}
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {isFinite(vendasExtraDia) ? `(~${num(vendasExtraDia)} a mais por dia de venda)` : ""}
+          {isFinite(pctAumento) && (
+            <>
+              {" "}
+              — um aumento de <strong className="text-foreground">{pctAumento.toFixed(0)}%</strong>{" "}
+              sobre o que você já precisa vender pra meta
+            </>
+          )}
+        </p>
+        {isFinite(vendasExtra) && margem > 0 && (
+          <p className="text-xs text-muted-foreground mt-2">
+            A partir daí, cada {unidade} extra que ele ajudar a gerar coloca{" "}
+            <strong className="text-[color:var(--color-success)]">{brl(margem)}</strong> de margem
+            no seu bolso.
+          </p>
+        )}
+      </div>
+
+      {extrapolaCapacidade && (
+        <div className="rounded-lg border border-[color:var(--color-warning)]/60 bg-[color:var(--color-warning)]/10 p-3 text-xs sm:text-sm mb-3 leading-relaxed">
+          ⚠️ <strong>Atenção:</strong> meta + vendas extras passam da sua capacidade atual (
+          {num(capacidadeMes)} {unidade}s/mês). Nesse caso a conta só fecha se o novo {prof}{" "}
+          também <strong>aumentar a sua capacidade</strong> de atendimento/produção — que é
+          justamente o efeito mais comum de contratar. Atualize a capacidade na aba 2 pra simular o
+          cenário com ele dentro.
+        </div>
+      )}
+
+      {/* Semáforo: quando contratar */}
+      <div className={`rounded-lg border p-3 text-xs sm:text-sm leading-relaxed ${sinal.classe}`}>
+        <div className="font-semibold text-foreground mb-0.5">
+          {sinal.emoji} {sinal.titulo}
+        </div>
+        <p className="text-muted-foreground">{sinal.texto}</p>
+      </div>
+
+      <details className="mt-3 text-xs text-muted-foreground">
+        <summary className="cursor-pointer select-none hover:text-foreground">
+          De onde vem esse custo? (encargos de lei, Simples Nacional)
+        </summary>
+        <div className="mt-2 space-y-1 pl-1">
+          {ENCARGOS_BREAKDOWN.map((e) => (
+            <div key={e.nome} className="flex justify-between max-w-sm">
+              <span>{e.nome}</span>
+              <span>
+                {e.pct.toFixed(2).replace(".", ",")}% = {brl(state.funcSalario * (e.pct / 100))}
+              </span>
+            </div>
+          ))}
+          <div className="flex justify-between max-w-sm font-semibold text-foreground border-t border-border pt-1">
+            <span>Total de encargos</span>
+            <span>
+              {ENCARGOS_SIMPLES_PCT.toFixed(2).replace(".", ",")}% = {brl(encargos)}
+            </span>
+          </div>
+          <p className="pt-1 leading-relaxed">
+            No Simples Nacional o INSS patronal já está embutido na guia DAS — não é pago à parte.
+            Se a sua empresa for Lucro Presumido ou Real, some ~28,8% de INSS patronal +
+            RAT/terceiros e confirme com seu contador.
+          </p>
+        </div>
+      </details>
+    </SectionCard>
   );
 }
 
@@ -1747,52 +2326,41 @@ function PriceBar({
 
 function RecomendacaoCard({
   recomendacao,
-  capacidade,
-  unidade,
   onUsar,
 }: {
   recomendacao: {
     preco: number | null;
-    tipo: "folga" | "apertado" | "impossivel";
-    motivo: string;
+    tipo: "folga" | "apertado" | "subir" | "impossivel";
+    frase: string;
   };
-  capacidade: number;
-  unidade: string;
   onUsar: (p: number) => void;
 }) {
-  const isOk = recomendacao.preco !== null;
+  const emoji =
+    recomendacao.tipo === "folga" ? "⭐" : recomendacao.tipo === "impossivel" ? "⚠️" : "📈";
   return (
     <section
       className={`mt-4 rounded-xl border p-3 sm:p-4 ${
         recomendacao.tipo === "folga"
           ? "border-primary/50 bg-primary/5"
-          : recomendacao.tipo === "apertado"
-            ? "border-[color:var(--color-warning)]/60 bg-[color:var(--color-warning)]/10"
-            : "border-destructive/50 bg-destructive/10"
+          : recomendacao.tipo === "impossivel"
+            ? "border-destructive/50 bg-destructive/10"
+            : "border-[color:var(--color-warning)]/60 bg-[color:var(--color-warning)]/10"
       }`}
     >
       <div className="flex items-start gap-3">
-        <div className="text-2xl">{isOk ? "⭐" : "⚠️"}</div>
+        <div className="text-2xl">{emoji}</div>
         <div className="flex-1 min-w-0">
           <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
             Recomendação
           </div>
-          {isOk ? (
-            <>
-              <div className="font-display text-lg sm:text-xl leading-tight">
-                Pra {capacidade} {unidade}, use{" "}
-                <span className="ember-text">{brl(recomendacao.preco!)}</span> de ticket
-              </div>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-1">{recomendacao.motivo}</p>
-              <button
-                onClick={() => onUsar(recomendacao.preco!)}
-                className="mt-2 text-xs px-3 py-1.5 rounded-md bg-primary text-primary-foreground font-semibold hover:opacity-90"
-              >
-                Usar esse ticket
-              </button>
-            </>
-          ) : (
-            <p className="text-sm text-foreground mt-1">{recomendacao.motivo}</p>
+          <p className="text-sm text-foreground mt-1 leading-relaxed">{recomendacao.frase}</p>
+          {recomendacao.tipo === "subir" && recomendacao.preco !== null && (
+            <button
+              onClick={() => onUsar(recomendacao.preco!)}
+              className="mt-2 text-xs px-3 py-1.5 rounded-md bg-primary text-primary-foreground font-semibold hover:opacity-90"
+            >
+              Usar {brl(recomendacao.preco)}
+            </button>
           )}
         </div>
       </div>
