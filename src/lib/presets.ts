@@ -376,6 +376,149 @@ export const PRESETS: Preset[] = [
     avisoConfianca:
       "O ticket médio e a taxa de conversão de passantes deste nicho não têm fonte de mercado confiável — são estimativas de partida. CAC também é genérico. Verifique os valores reais do seu shopping/região antes de usar para decisões importantes.",
     notasReferencia: ["Aluguel típico de quiosque: 20–30% do faturamento."],
+    estrategia: {
+      intro:
+        "Quiosque de beleza vive de fluxo. Você paga um aluguel altíssimo (20–30% do faturamento) pra estar onde a pessoa passa — se ela passa e não para, você paga aluguel pra nada. O jogo é converter passante em cliente, subir o ticket com kit e criar recorrência pra não depender só do fluxo do shopping.",
+      principio:
+        "Você não controla o movimento do shopping, o clima nem se o cinema tá cheio. Controla a vitrine, a abordagem, a oferta do dia e o WhatsApp que traz o cliente de volta. Cada passante ignorado é aluguel queimado.",
+      cliente: {
+        quemE:
+          "Mulher (majoritariamente) entre 18 e 45, decidindo por impulso, que passou pra fazer outra coisa (comer, cinema, banco). Compra pequena, emocional, testa produto novo — mas só se algo chamar atenção nos primeiros 3 segundos.",
+        ondeEsta:
+          "Passando na frente do quiosque (canal #1), Instagram local (marca 'em [shopping X]'), TikTok de review de beleza e no WhatsApp (onde a recompra mora — quiosque sem base de WhatsApp é quiosque refém do shopping).",
+        oQueEleQuer:
+          "Descoberta rápida ('experimenta aqui'), preço claro, kit que parece um presente pra si mesma e sensação de barganha (leva 3 paga 2, brinde surpresa).",
+      },
+      funil: [
+        {
+          emoji: "👁️",
+          titulo: "Parar o passante — vitrine e primeiros 3 segundos",
+          oQueE: "Quem não para, não compra. A vitrine, a iluminação e a cara da atendente decidem se a pessoa desacelera ou passa reto.",
+          numeroPraMedir: "Quantas pessoas passaram vs. quantas pararam no quiosque por hora (contagem manual amostral 1x por semana).",
+          acoes: [
+            "Um produto-âncora bem iluminado na quina, com preço grande e visível — não vitrine cheia de tudo.",
+            "Atendente em pé na frente, nunca sentada olhando celular. Sorriso e uma frase-gatilho ('experimenta o novo hidratante?').",
+            "Cheiro conta: difusor com fragrância marcante para 3 metros de raio. Olfato para o passante que a vitrine perdeu.",
+          ],
+        },
+        {
+          emoji: "🤝",
+          titulo: "Abordar e testar — do 'só olhando' pra mão no produto",
+          oQueE: "Cliente que pega o produto na mão compra 5x mais que quem só olha. Abordagem certa é convidar pra experimentar, não pra ouvir vendedor.",
+          numeroPraMedir: "De 10 que pararam, quantas testam algum produto.",
+          acoes: [
+            "Sempre ofereça teste (mão, braço, um cheirinho). 'Posso te mostrar como esse funciona?' abre porta sem pressionar.",
+            "Fale valor, não preço, primeiro: 'esse hidrata por 24h, cabe na bolsa' — o preço vem depois do encanto.",
+            "Se ela recusar, entregue um cartão com QR do Instagram/WhatsApp: 'quando quiser, olha nossas promoções'.",
+          ],
+        },
+        {
+          emoji: "🛍️",
+          titulo: "Fechar a venda — combo antes de único",
+          oQueE: "Ticket de um item só não sustenta o aluguel. A venda tem que nascer combo — 2 unidades, kit, 'leva 3 paga 2'.",
+          numeroPraMedir: "Ticket médio do quiosque (na aba Ajustes).",
+          acoes: [
+            "Nunca ofereça 1 item: sempre 'leva a dupla que sai por X' ou 'com o segundo por metade'.",
+            "Kit-presente montado e embalado na hora — vira ideia para 'já que estou aqui, dou pra minha mãe também'.",
+            "Preço com âncora: um produto premium caro na vitrine faz o kit médio parecer barato.",
+          ],
+        },
+        {
+          emoji: "📲",
+          titulo: "Capturar contato — do caixa pro WhatsApp",
+          oQueE: "Cliente que sai sem virar contato é cliente do shopping, não seu. Sua base de WhatsApp é o único ativo que sobrevive se o quiosque mudar de ponto.",
+          numeroPraMedir: "% de clientes do mês que entraram na lista de WhatsApp.",
+          acoes: [
+            "No caixa, sempre: 'quer entrar na lista VIP? Toda sexta mando o desconto do fim de semana'.",
+            "Incentivo pequeno pra entrar: brinde de amostra ou cupom de 10% na próxima. Custa centavos, vale ouro.",
+            "Nota fiscal no e-mail/WhatsApp já captura o contato de brinde — use a lei a favor.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Fazer voltar — recompra sem depender do fluxo",
+          oQueE: "Segunda-feira chuvosa? Cliente da lista VIP vem quando o shopping tá vazio. É a sua receita previsível.",
+          numeroPraMedir: "% do faturamento que veio de clientes já cadastrados (repetição).",
+          acoes: [
+            "Toda sexta: cardápio da semana com desconto exclusivo pra lista VIP no WhatsApp.",
+            "Aniversário do cliente = cupom de brinde. Simples e emocional.",
+            "Segmente a lista: quem comprou hidratante volta em 60 dias — dispare oferta 45 dias depois.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Movimento do shopping caiu e minha venda foi junto",
+          realidade:
+            "Você não controla âncora do shopping, cinema fechando ou obra na entrada. Controla a sua base própria (WhatsApp, Instagram) e as ações de reativação.",
+          caminho: [
+            "Ative a lista VIP com promoção-relâmpago pra trazer quem já é cliente — não depende do fluxo.",
+            "Faça live/story mostrando os produtos ao vivo do quiosque nos dias fracos — traz gente que já ia passar longe.",
+            "Renegocie o aluguel: com o fluxo caindo, o shopping também tem interesse em manter você — traga números.",
+          ],
+        },
+        {
+          problema: "Vendo pouco no fim do mês (todo mês)",
+          realidade:
+            "A renda do seu cliente tem ciclo. Você não muda o salário dele, mas muda a sua agenda de ofertas pra pegar o começo do mês forte e sobreviver o fim.",
+          caminho: [
+            "Lançamento e kit premium na primeira quinzena. Produto de entrada e leve-3-pague-2 na segunda quinzena.",
+            "Parcelamento sem juros nos últimos 10 dias do mês — desbloqueia compra que ia esperar.",
+            "Programe disparo pra lista VIP no 5º dia útil: salário caiu, oferta na cara.",
+          ],
+        },
+        {
+          problema: "Concorrente do quiosque em frente vende mais barato",
+          realidade:
+            "Guerra de preço em quiosque destrói margem porque o aluguel não cai. Você não controla o preço dele — controla a experiência, o kit e a base.",
+          caminho: [
+            "Não iguale preço unitário: monte kits que ele não tem, com embalagem-presente.",
+            "Atendimento com nome, memória do gosto do cliente, WhatsApp que responde — o que ele não faz é sua vantagem.",
+            "Sua lista VIP é sua muralha: cliente que se sente da casa não atravessa 10 metros por R$ 5.",
+          ],
+        },
+        {
+          problema: "Faturamento parece bom mas o mês fecha ruim",
+          realidade:
+            "Aluguel de quiosque come 20–30% direto. Se o CMV subiu e o ticket não subiu junto, você trabalhou o mês pro shopping.",
+          caminho: [
+            "Preencha custos reais na aba Ajustes (aluguel, taxa cartão, comissão, CMV) — a calculadora mostra o ponto de equilíbrio real.",
+            "Se ticket médio está abaixo da meta, foco imediato em kit e leve-3-pague-2. Vender 1 unidade por vez em quiosque é prejuízo.",
+            "Renegocie aluguel percentual: em shopping fraco, muitos aceitam 'mínimo garantido + %' menor.",
+          ],
+        },
+        {
+          problema: "Não sei quantas pessoas preciso alcançar pra bater a meta",
+          realidade:
+            "Sem contar quantos passantes viram parada, teste, compra e recorrência, é impossível ajustar. Você fica no achismo enquanto o aluguel vence dia 10.",
+          caminho: [
+            "Uma vez por semana, conte manualmente por 1 hora: passantes, paradas, testes, compras. Extrapole pro mês.",
+            "Preencha essas taxas na aba Ajustes — a calculadora mostra quantas pessoas precisam PARAR pra você bater a meta.",
+            "Se a taxa de parada é o gargalo, mexa em vitrine. Se é a de fechamento, treine abordagem. Cada etapa tem uma ação diferente.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "10 minutos",
+          acoes: [
+            "Anote: faturamento, ticket médio, quantos entraram na lista VIP, ranking do produto mais vendido.",
+            "Dispare a oferta de sexta pra lista VIP.",
+            "Troque a vitrine/produto-âncora se o da semana ficou fraco.",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "45 minutos",
+          acoes: [
+            "Feche as taxas do funil (paradas, testes, vendas) e compare com o Plano do mês.",
+            "Cheque o CMV real do mix vendido e se o ticket está acompanhando os aumentos de custo.",
+            "Reveja a divisão do mix (entrada / médio / premium) e reposicione a vitrine.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "clinica",
