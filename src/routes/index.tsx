@@ -652,6 +652,24 @@ function Index() {
           </SectionCard>
         )}
 
+        {tab === "capacidade" && preset.insightsCapacidade && (
+          <PotencialCard
+            state={state}
+            patch={patch}
+            preset={preset}
+            capacidadeMes={capacidadeMes}
+            unidadesMeta={unidadesMeta}
+            margemEfetiva={margemEfetiva}
+            custosFixos={custosFixos}
+            alcanceMes={alcanceMes}
+            investAdsMes={investAdsMes}
+            cacMed={cacMed}
+            convMed={convMed}
+            pctOrgRegime={pctOrgRegime}
+            setTab={setTab}
+          />
+        )}
+
         {tab === "equipe" && (
           <EquipeTab
             state={state}
@@ -2501,6 +2519,168 @@ function VendedorCard({
         </div>
       </div>
     </div>
+  );
+}
+
+/* =========================================================================
+   Potencial da capacidade (aba 2) — quanto dinheiro há na capacidade parada
+   ========================================================================= */
+
+function PotencialCard({
+  state,
+  patch,
+  preset,
+  capacidadeMes,
+  unidadesMeta,
+  margemEfetiva,
+  custosFixos,
+  alcanceMes,
+  investAdsMes,
+  cacMed,
+  convMed,
+  pctOrgRegime,
+  setTab,
+}: {
+  state: State;
+  patch: (p: Partial<State>) => void;
+  preset: Preset;
+  capacidadeMes: number;
+  unidadesMeta: number;
+  margemEfetiva: number;
+  custosFixos: number;
+  alcanceMes: number;
+  investAdsMes: number;
+  cacMed: number;
+  convMed: number;
+  pctOrgRegime: number;
+  setTab: (t: "meta" | "parametros" | "capacidade" | "equipe" | "plano" | "estrategia") => void;
+}) {
+  const unidade = preset.rotulos.unidadeVenda;
+  if (margemEfetiva <= 0 || !isFinite(unidadesMeta) || capacidadeMes <= 0) return null;
+
+  const utilizacao = (unidadesMeta / capacidadeMes) * 100;
+  const ociososMes = Math.max(0, capacidadeMes - unidadesMeta);
+  const ociososDia = Math.ceil(ociososMes / state.diasVenda);
+  const lucroPotencial = capacidadeMes * margemEfetiva - custosFixos;
+  const multiplo = state.metaLucro > 0 ? lucroPotencial / state.metaLucro : 0;
+
+  // O que precisaria acontecer pra encher a capacidade (com os números deles)
+  const alcanceCheio =
+    convMed > 0 ? Math.ceil((capacidadeMes * (pctOrgRegime / 100)) / (convMed / 100)) : Infinity;
+  const adsCheio = capacidadeMes * (1 - pctOrgRegime / 100) * cacMed;
+
+  // Meta sugerida usando 80% da capacidade (com folga pra imprevistos)
+  const meta80 = Math.floor((0.8 * capacidadeMes * margemEfetiva - custosFixos) / 100) * 100;
+
+  // Capacidade praticamente cheia: a mensagem inverte — o gargalo é produção
+  if (utilizacao >= 95) {
+    return (
+      <SectionCard
+        title="🚀 Potencial da sua capacidade"
+        help="Quanto ainda cabe na sua estrutura — e o que fazer quando ela enche."
+      >
+        <div className="rounded-lg border border-[color:var(--color-warning)]/60 bg-[color:var(--color-warning)]/10 p-4 text-sm leading-relaxed">
+          ⚡ Sua meta já usa <strong>{utilizacao.toFixed(0)}%</strong> da capacidade — aqui o
+          gargalo É a produção. Pra crescer daqui: suba o ticket (aba{" "}
+          <button onClick={() => setTab("meta")} className="text-primary underline underline-offset-2">
+            Meta
+          </button>
+          , ancoragem) ou aumente a capacidade — mais gente (aba{" "}
+          <button onClick={() => setTab("equipe")} className="text-primary underline underline-offset-2">
+            Equipe
+          </button>
+          , simulador de contratação), mais horário, mais equipamento.
+        </div>
+      </SectionCard>
+    );
+  }
+
+  return (
+    <SectionCard
+      title="🚀 Potencial da sua capacidade"
+      help="Sua estrutura aguenta mais do que a meta pede. Essa diferença é potencial parado — e ele tem preço."
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+        <MiniKpi
+          label="Sua estrutura aguenta"
+          value={`${num(capacidadeMes)} ${unidade}s/mês`}
+        />
+        <MiniKpi label="Sua meta usa" value={`${utilizacao.toFixed(0)}%`} highlight />
+        <MiniKpi
+          label="Parado, sem uso"
+          value={`${num(ociososMes)}/mês (~${num(ociososDia)}/dia)`}
+          warn
+        />
+      </div>
+
+      <div className="rounded-xl border-2 border-[color:var(--color-success)]/50 bg-[color:var(--color-success)]/5 p-4 text-center mb-3">
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">
+          Se você enchesse a capacidade, com o ticket atual
+        </div>
+        <div className="font-display text-3xl sm:text-4xl text-[color:var(--color-success)] py-1">
+          {brl(lucroPotencial)}/mês
+        </div>
+        <p className="text-sm text-muted-foreground">
+          de lucro no bolso — {multiplo >= 1.05 ? `${multiplo.toFixed(1).replace(".", ",")}× a sua meta atual` : "praticamente a sua meta atual"}.
+        </p>
+        <p className="text-sm font-semibold mt-2">
+          ⚡ Essa é a sua capacidade de produção. O que está te impedindo de chegar nela?
+        </p>
+        {meta80 > state.metaLucro && (
+          <button
+            onClick={() => patch({ metaLucro: meta80 })}
+            className="mt-3 text-xs px-4 py-2 rounded-md bg-[color:var(--color-success)] text-[color:var(--color-success-foreground)] font-semibold hover:opacity-90"
+          >
+            Simular meta usando 80% da capacidade → {brl(meta80)}
+          </button>
+        )}
+      </div>
+
+      <div className="rounded-lg border border-border bg-background p-3 mb-3">
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-2">
+          O que precisaria acontecer pra encher — com os SEUS números
+        </div>
+        <ul className="space-y-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+          <li className="flex gap-2">
+            <span className="shrink-0">📣</span>
+            <span>
+              Alcançar ~<strong className="text-foreground">{num(alcanceCheio)}</strong> pessoas/mês
+              no orgânico — hoje seu plano mira {num(alcanceMes)}.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span className="shrink-0">💸</span>
+            <span>
+              Investir ~<strong className="text-foreground">{brl(adsCheio)}</strong>/mês em
+              anúncios pra fatia paga — hoje seu plano investe {brl(investAdsMes)}.
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span className="shrink-0">🔁</span>
+            <span>
+              Ou o caminho mais barato: <strong className="text-foreground">recompra</strong> —
+              cliente que volta enche capacidade sem pagar anúncio de novo.
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      {preset.insightsCapacidade && (
+        <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+          <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-2">
+            Por que o número não bate com a capacidade — {preset.nome}
+          </div>
+          <ul className="space-y-1.5">
+            {preset.insightsCapacidade.map((i) => (
+              <li key={i} className="text-xs sm:text-sm text-muted-foreground leading-relaxed flex gap-2">
+                <span className="text-primary shrink-0">→</span>
+                <span>{i}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </SectionCard>
   );
 }
 

@@ -82,6 +82,9 @@ export type Preset = {
   // Guia estratégico (aba 5) — começamos pela açaiteria; os demais nichos
   // ganham o seu conforme o formato for validado.
   estrategia?: Estrategia;
+  // Insights do nicho pra capacidade ociosa (aba 2). Presença deste campo
+  // liga o card "Potencial da sua capacidade" — açaiteria primeiro.
+  insightsCapacidade?: string[];
 };
 
 const zeroCusto: EstruturaCusto = {
@@ -112,6 +115,12 @@ export const PRESETS: Preset[] = [
     notasReferencia: [
       "CMV típico: 40% (margem bruta ~60%).",
       "CAC e conversão são estimativas genéricas de delivery/food — ajuste com seus dados reais.",
+    ],
+    insightsCapacidade: [
+      "No açaí, capacidade parada quase nunca é problema de produção — é demanda: pouca gente vendo você (alcance), atrito na hora de pedir (conversão) ou cliente que não volta (recompra).",
+      "O pico (noite e fim de semana) costuma encher sozinho. O espaço real está nos horários e dias mortos: promoção de meio de semana e da tarde vende pra capacidade que hoje você joga fora.",
+      "Capacidade não estoca: o copo que não saiu hoje não volta amanhã — cada dia ocioso é margem perdida pra sempre.",
+      "Antes de aumentar a loja, encha a que existe: alcance → conversão → recompra, nessa ordem. O mapa completo está na aba 🧭 Estratégia.",
     ],
     estrategia: {
       intro:
