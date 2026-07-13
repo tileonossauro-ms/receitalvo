@@ -434,6 +434,149 @@ export const PRESETS: Preset[] = [
       custoInsumosPct: 40,
       adicionais: ["Cookie", "Brownie", "Trufa", "Bolo grande sob encomenda"],
     },
+    estrategia: {
+      intro:
+        "Doce caseiro não morre por falta de gente com vontade — morre por não ter previsibilidade. Quem vive disso vive de três coisas: encomenda que se planeja, ponto de venda que gira sozinho e cliente que volta. Esta página é o mapa; as outras abas são o painel de números.",
+      principio:
+        "Você não controla o preço do ovo nem a moda do concorrente. Controla o tamanho da porção, o valor percebido do seu doce e a agenda da semana. O jogo é transformar 'quem viu' em encomenda combinada — com data, hora e dinheiro na mão.",
+      cliente: {
+        quemE:
+          "Vizinhança, colegas de trabalho da região, mães de escola, escritórios pequenos e clientes de datas (aniversário, dia das mães, páscoa, natal). Compra emocional e por confiança — quem come de você fala de você.",
+        ondeEsta:
+          "WhatsApp (onde a encomenda fecha), Instagram (onde nasce a vontade, com foto e vídeo do processo), grupos de bairro/condomínio e ponto físico parceiro (padaria, cafeteria, salão que revende).",
+        oQueEleQuer:
+          "Foto que dá água na boca, preço claro (unidade, kit, caixa), facilidade pra encomendar e uma sensação de 'feito pra mim' — feito à mão vale mais que produção industrial, esse é o seu ativo.",
+      },
+      funil: [
+        {
+          emoji: "👀",
+          titulo: "Ser visto — alcance na região",
+          oQueE: "Quem não é lembrado não é comprado. Doce artesanal precisa aparecer no feed da vizinhança na semana em que a pessoa vai encomendar.",
+          numeroPraMedir: "Visualizações por post/story por semana e novos contatos no WhatsApp por mês.",
+          acoes: [
+            "Poste o processo, não só o produto: vídeo do recheio, do glacê caindo — mostra que é feito à mão e vale mais.",
+            "Entre em 3 grupos de bairro / condomínio / mães da escola e apareça toda semana com uma foto e um combo.",
+            "Deixe amostra em 1 ponto parceiro (cafeteria, salão): quem prova, pede — e o parceiro ganha uma comissão simbólica.",
+          ],
+        },
+        {
+          emoji: "📱",
+          titulo: "Virar contato — do stories pro WhatsApp",
+          oQueE: "Vontade sem canal direto vira nada. Cada post precisa terminar com 'me chama no zap' e cardápio pronto pra responder.",
+          numeroPraMedir: "De 10 pessoas que viram o post, quantas mandam mensagem?",
+          acoes: [
+            "Cardápio-catálogo no WhatsApp Business com foto, preço, prazo e formas de pagamento — evita 30 min de conversa por pedido.",
+            "Link direto do WhatsApp na bio e em todo story (figurinha de link).",
+            "Responda em minutos: no artesanal, quem demora 2h pra responder perde pra quem responde na hora.",
+          ],
+        },
+        {
+          emoji: "📅",
+          titulo: "Fechar a encomenda — data, hora, sinal",
+          oQueE: "'Depois eu confirmo' é venda perdida. Encomenda de verdade tem data marcada e, quando o volume é maior, sinal pago antes.",
+          numeroPraMedir: "De cada 10 conversas, quantas viram pedido pago (não só 'combinado').",
+          acoes: [
+            "Combos prontos com preço fechado: caixa de 6, 12, 24. Kit reduz a decisão e sobe o ticket sem esforço.",
+            "Encomenda grande (festa, corporativo): 30–50% de sinal via Pix antes de comprar insumo. Trava o cliente e protege seu caixa.",
+            "Prazo mínimo de encomenda claro (ex.: 48h): quem respeita seu prazo é cliente de verdade, quem não respeita é dor de cabeça.",
+          ],
+        },
+        {
+          emoji: "🍫",
+          titulo: "Subir o ticket — kits, upsell e datas",
+          oQueE: "Vender mais pra quem já ia comprar é a venda mais barata. E as datas do calendário são o seu 'verão' — quem se prepara fatura o mês em uma semana.",
+          numeroPraMedir: "Ticket médio por pedido (na aba Ajustes) e faturamento nas datas comemorativas vs. mês comum.",
+          acoes: [
+            "Sempre ofereça 'quer levar mais 2 de outro sabor?' na finalização — 1 em cada 3 aceita.",
+            "Encarte de datas: páscoa, dia das mães, festa junina, natal. Cardápio especial pré-anunciado 30 dias antes com preço maior justificado pelo tema.",
+            "Kit corporativo (café da manhã do escritório, brinde de cliente) — 1 conta corporativa fixa vale 20 clientes soltos.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Fazer voltar — recorrência e indicação",
+          oQueE: "Cliente satisfeito de doce artesanal indica sozinho — se você lembrar dele. Sem lembrança, some.",
+          numeroPraMedir: "Quantos pedidos do mês vieram de quem já comprou antes.",
+          acoes: [
+            "Lista VIP no WhatsApp: toda quinta manda cardápio da semana, um combo em promoção e as datas de entrega.",
+            "Fidelidade simples: 10º pedido ganha um mimo. No artesanal, brinde surpreende mais que desconto.",
+            "Peça foto e depoimento — publique no story com o nome do cliente. Vira propaganda pra rede dele.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Insumo subiu (ovo, chocolate, farinha) e a margem sumiu",
+          realidade:
+            "Você não controla o preço da commodity — controla a receita da porção, a embalagem e a tabela. Segurar preço com CMV subindo é escolher trabalhar de graça.",
+          caminho: [
+            "Refaça a ficha técnica: peso exato de cada insumo por unidade. Sem isso, você não sabe o custo real.",
+            "Reajuste em blocos (ex.: a cada 3 meses), não a cada susto — cliente aceita reajuste programado, não zigue-zague.",
+            "Crie uma linha 'popular' (porção menor) e mantenha a premium com o preço novo — dá saída pros dois bolsos.",
+          ],
+        },
+        {
+          problema: "Encomenda cancelada em cima da hora / cliente sumiu",
+          realidade:
+            "Combinado sem sinal é conversa fiada. Você não controla o compromisso dos outros — controla a regra da sua venda.",
+          caminho: [
+            "Sinal via Pix pra qualquer encomenda acima de X reais. Sem sinal, não entra na agenda.",
+            "Confirmação automática 48h antes por WhatsApp: quem não confirma perde a vaga.",
+            "Regra de cancelamento clara no cardápio (ex.: cancelou em menos de 24h, sinal não volta).",
+          ],
+        },
+        {
+          problema: "Concorrente vende mais barato e cliente compara",
+          realidade:
+            "Guerra de preço no artesanal é competir com fábrica. Você não vence — e não precisa. Seu preço reflete tempo, mão e ingrediente melhor.",
+          caminho: [
+            "Mostre o processo (vídeo, foto) — cliente que vê o trabalho aceita o preço.",
+            "Nunca dê desconto direto no doce; dá brinde ('leva 5, ganha 1') pra proteger a percepção de valor.",
+            "Foque em quem paga: cliente que só compra o mais barato não é seu público, é do supermercado.",
+          ],
+        },
+        {
+          problema: "Vendo bem em data comemorativa e no mês normal fica parado",
+          realidade:
+            "Doce vive de dois ciclos: o previsível (semana normal) e o de pico (datas). Sem trabalhar o previsível, você vive de ansiedade entre uma páscoa e outra.",
+          caminho: [
+            "Instale 3 pontos parceiros pra vender no mês comum: cafeteria, salão, escritório. Comissão simbólica pro parceiro, giro pra você.",
+            "Assinatura simples: 'kit da semana' entregue toda sexta pra 10–20 clientes fixos. Faturamento previsível.",
+            "Antecipe a próxima data: pedidos abertos com desconto 30 dias antes — trava agenda e caixa.",
+          ],
+        },
+        {
+          problema: "Não sei quanto preciso vender pra ganhar dinheiro de verdade",
+          realidade:
+            "No artesanal, é fácil confundir dinheiro entrando com lucro. Se você não separa custo do insumo, sua mão de obra e o seu 'pró-labore', trabalha o mês pra pagar o mercado.",
+          caminho: [
+            "Preencha a aba Ajustes com custo real, seu salário desejado e conta de casa — a calculadora te mostra quantas unidades por mês pra fechar no azul.",
+            "Vá na aba Plano do mês: quantos contatos por semana, quantas encomendas por dia. É a sua receita previsível traduzida em rotina.",
+            "Toda semana, marque quantas encomendas fechou e compare com o plano — desvio de duas semanas seguidas é sinal pra ajustar oferta.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "15 minutos",
+          acoes: [
+            "Poste 3 vezes: um processo, um combo, um depoimento de cliente.",
+            "Mande cardápio da semana pra lista VIP (sexta é o melhor dia).",
+            "Anote: quantos pedidos, ticket médio, quantos clientes voltaram.",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "45 minutos",
+          acoes: [
+            "Refaça o CMV real: total gasto em insumos ÷ faturamento. Está passando de 40%? Ajuste porção ou preço.",
+            "Olhe o calendário: qual é a próxima data? Comece a divulgar 30 dias antes.",
+            "Revise a lista de pontos parceiros: quem vendeu bem, quem parou. Renove ou troque.",
+          ],
+        },
+      ],
+    },
   },
 ];
 
