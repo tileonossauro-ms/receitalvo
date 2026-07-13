@@ -154,7 +154,9 @@ function Index() {
   const [nichoAtivo, setNichoAtivo] = useState<string>("acaiteria");
   const [state, setState] = useState<State>(() => makeDefaults(PRESETS[0]));
   const [dark, setDark] = useState(true);
-  const [tab, setTab] = useState<"meta" | "parametros" | "capacidade" | "equipe" | "plano">("meta");
+  const [tab, setTab] = useState<
+    "meta" | "parametros" | "capacidade" | "equipe" | "plano" | "estrategia"
+  >("meta");
   const [nichoPendente, setNichoPendente] = useState<string | null>(null);
   const [capaAberta, setCapaAberta] = useState(false);
 
@@ -488,6 +490,7 @@ function Index() {
             { id: "capacidade", label: "2. Capacidade" },
             { id: "equipe", label: "3. Equipe" },
             { id: "plano", label: "4. Plano do mês" },
+            { id: "estrategia", label: "🧭 5. Estratégia" },
           ].map((t) => (
             <button
               key={t.id}
@@ -766,6 +769,8 @@ function Index() {
           </>
         )}
 
+        {tab === "estrategia" && <EstrategiaTab preset={preset} setTab={setTab} />}
+
         <FormulasCard unidade={preset.rotulos.unidadeVenda} />
       </main>
 
@@ -1016,7 +1021,7 @@ function MetaGuiadaTab({
     tipo: "folga" | "apertado" | "subir" | "impossivel";
     frase: string;
   };
-  setTab: (t: "meta" | "parametros" | "capacidade" | "equipe" | "plano") => void;
+  setTab: (t: "meta" | "parametros" | "capacidade" | "equipe" | "plano" | "estrategia") => void;
 }) {
   const unidade = preset.rotulos.unidadeVenda;
   const plural = (n: number, s: string) => `${s}${n === 1 ? "" : "s"}`;
@@ -2495,6 +2500,176 @@ function VendedorCard({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   Estratégia (aba 5) — o mapa do negócio, do lead à recompra
+   ========================================================================= */
+
+function EstrategiaTab({
+  preset,
+  setTab,
+}: {
+  preset: Preset;
+  setTab: (t: "meta" | "parametros" | "capacidade" | "equipe" | "plano" | "estrategia") => void;
+}) {
+  const e = preset.estrategia;
+
+  if (!e) {
+    return (
+      <SectionCard
+        title="🧭 Estratégia do seu nicho"
+        help="O mapa de como pensar o negócio — do lead à venda e à recompra."
+      >
+        <div className="rounded-lg border border-dashed border-border bg-background p-6 text-center">
+          <div className="text-3xl mb-2">🚧</div>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-md mx-auto">
+            O guia estratégico de <strong className="text-foreground">{preset.nome}</strong> está
+            em construção — começamos pela Açaiteria pra acertar o formato. O jeito de pensar vale
+            pra todo negócio: <strong className="text-foreground">meça seus números, conheça seu
+            cliente, construa ofertas que conversam com ele e invista energia no que gera caixa</strong>
+            {" "}— não no que você não controla.
+          </p>
+        </div>
+      </SectionCard>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <SectionCard title="🧭 O jogo do seu negócio" help={e.intro}>
+        <div className="rounded-lg border-2 border-primary/50 bg-primary/5 p-4 text-center">
+          <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">
+            O princípio que muda tudo
+          </div>
+          <p className="text-sm sm:text-base font-semibold leading-relaxed">{e.principio}</p>
+        </div>
+      </SectionCard>
+
+      <SectionCard
+        title="👤 Quem é o seu cliente"
+        help="Antes da oferta vem a pessoa. Tudo que você comunica parte daqui."
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {[
+            { titulo: "Quem ele é", texto: e.cliente.quemE, emoji: "🙋" },
+            { titulo: "Onde ele está", texto: e.cliente.ondeEsta, emoji: "📍" },
+            { titulo: "O que ele quer", texto: e.cliente.oQueEleQuer, emoji: "✨" },
+          ].map((c) => (
+            <div key={c.titulo} className="rounded-lg border border-border bg-background p-3">
+              <div className="text-lg mb-1">{c.emoji}</div>
+              <div className="text-sm font-semibold mb-1">{c.titulo}</div>
+              <p className="text-xs text-muted-foreground leading-relaxed">{c.texto}</p>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
+      <SectionCard
+        title="🛤️ A esteira: do lead à recompra"
+        help="Quatro etapas, cada uma com UM número pra medir e ações simples. O dinheiro entra quando as quatro funcionam juntas."
+      >
+        <div className="space-y-3">
+          {e.funil.map((etapa, i) => (
+            <div key={etapa.titulo} className="rounded-lg border border-border bg-background p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="font-display text-lg text-primary">{i + 1}.</span>
+                <span className="text-lg">{etapa.emoji}</span>
+                <h3 className="font-semibold text-sm sm:text-base">{etapa.titulo}</h3>
+              </div>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-2">
+                {etapa.oQueE}
+              </p>
+              <div className="rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-xs mb-2">
+                📏 <strong>O número pra medir:</strong> {etapa.numeroPraMedir}
+              </div>
+              <ul className="space-y-1">
+                {etapa.acoes.map((a) => (
+                  <li key={a} className="text-xs sm:text-sm text-muted-foreground leading-relaxed flex gap-2">
+                    <span className="text-[color:var(--color-success)] shrink-0">✔</span>
+                    <span>{a}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
+      <SectionCard
+        title="🧱 Problemas que TODO negócio como o seu enfrenta"
+        help="O choque de realidade: em cada um, o que você NÃO controla — e o caminho pelo que você controla. Toque pra abrir."
+      >
+        <div className="space-y-2">
+          {e.problemas.map((p) => (
+            <details
+              key={p.problema}
+              className="group rounded-lg border border-border bg-background p-3"
+            >
+              <summary className="flex items-center justify-between cursor-pointer list-none select-none gap-2">
+                <span className="text-sm font-semibold">“{p.problema}”</span>
+                <span className="text-muted-foreground transition group-open:rotate-90">›</span>
+              </summary>
+              <div className="mt-2 space-y-2">
+                <p className="text-xs sm:text-sm rounded-md border border-[color:var(--color-warning)]/60 bg-[color:var(--color-warning)]/10 p-2.5 leading-relaxed">
+                  💡 <strong>A realidade:</strong> {p.realidade}
+                </p>
+                <ul className="space-y-1">
+                  {p.caminho.map((c) => (
+                    <li key={c} className="text-xs sm:text-sm text-muted-foreground leading-relaxed flex gap-2">
+                      <span className="text-primary shrink-0">→</span>
+                      <span>{c}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </details>
+          ))}
+        </div>
+      </SectionCard>
+
+      <SectionCard
+        title="📅 A rotina de quem chega na meta"
+        help="Estratégia sem rotina é desejo. Isso aqui cabe em qualquer semana."
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {e.rotina.map((r) => (
+            <div key={r.frequencia} className="rounded-lg border border-border bg-background p-3">
+              <div className="flex items-baseline justify-between mb-2">
+                <div className="text-sm font-semibold">{r.frequencia}</div>
+                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                  {r.duracao}
+                </div>
+              </div>
+              <ul className="space-y-1.5">
+                {r.acoes.map((a) => (
+                  <li key={a} className="text-xs sm:text-sm text-muted-foreground leading-relaxed flex gap-2">
+                    <span className="shrink-0">☐</span>
+                    <span>{a}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground mt-3">
+          Os números dessa rotina moram nas outras abas:{" "}
+          <button onClick={() => setTab("meta")} className="text-primary underline underline-offset-2">
+            Meta
+          </button>
+          {" · "}
+          <button onClick={() => setTab("parametros")} className="text-primary underline underline-offset-2">
+            Ajustes
+          </button>
+          {" · "}
+          <button onClick={() => setTab("plano")} className="text-primary underline underline-offset-2">
+            Plano do mês
+          </button>
+          .
+        </p>
+      </SectionCard>
     </div>
   );
 }

@@ -32,6 +32,30 @@ export type Rotulos = {
   profissional: string; // "atendente", "profissional", "mecânico", "médico"
 };
 
+// Guia estratégico por nicho (aba 5). Conteúdo qualitativo de consultoria:
+// o passo a passo do lead à venda, problemas comuns e rotina do dono.
+// Nada aqui é estatística — são práticas comuns do nicho, em linguagem simples.
+export type EtapaFunil = {
+  emoji: string;
+  titulo: string;
+  oQueE: string;
+  numeroPraMedir: string;
+  acoes: string[];
+};
+export type ProblemaComum = {
+  problema: string;
+  realidade: string; // o "choque de realidade" — o que o dono controla de verdade
+  caminho: string[];
+};
+export type Estrategia = {
+  intro: string;
+  principio: string; // a frase-mãe da aba
+  cliente: { quemE: string; ondeEsta: string; oQueEleQuer: string };
+  funil: EtapaFunil[];
+  problemas: ProblemaComum[];
+  rotina: { frequencia: string; duracao: string; acoes: string[] }[];
+};
+
 export type Preset = {
   id: string;
   nome: string;
@@ -55,6 +79,9 @@ export type Preset = {
   produtoGuia?: ProdutoGuia;
   // metadados extras para exibição informativa
   notasReferencia?: string[];
+  // Guia estratégico (aba 5) — começamos pela açaiteria; os demais nichos
+  // ganham o seu conforme o formato for validado.
+  estrategia?: Estrategia;
 };
 
 const zeroCusto: EstruturaCusto = {
@@ -86,6 +113,142 @@ export const PRESETS: Preset[] = [
       "CMV típico: 40% (margem bruta ~60%).",
       "CAC e conversão são estimativas genéricas de delivery/food — ajuste com seus dados reais.",
     ],
+    estrategia: {
+      intro:
+        "Açaí não se vende sozinho o ano inteiro. Quem vive de açaí vive de quatro coisas: ser lembrado na hora da vontade, facilitar o pedido, aumentar o copo e fazer o cliente voltar. Esta página é o mapa — as outras abas são o painel de números desse mapa.",
+      principio:
+        "Você não controla o clima, o iFood nem o concorrente. Você controla a sua esteira de produtos, as suas ofertas e os seus números. Energia vai no que você controla.",
+      cliente: {
+        quemE:
+          "Jovens e famílias num raio de ~2 km, pedindo no fim da tarde e à noite, com pico no calor e no fim de semana. Açaí é compra por desejo, não por necessidade — o cliente precisa LEMBRAR de você na hora da vontade.",
+        ondeEsta:
+          "Instagram (onde o desejo nasce, com foto e vídeo), iFood/delivery (conveniência), Google Maps (quem busca 'açaí perto de mim') e WhatsApp (onde mora a recompra). Sua loja precisa existir bem nos quatro.",
+        oQueEleQuer:
+          "Foto que dá vontade, preço fácil de entender (combo pronto), pedido sem atrito, entrega rápida e o copo do jeito dele — os adicionais são metade da experiência.",
+      },
+      funil: [
+        {
+          emoji: "📣",
+          titulo: "Atrair — ser visto por quem tem vontade",
+          oQueE: "Fazer quem mora perto lembrar que você existe, principalmente nos horários de desejo (tarde/noite, calor, fim de semana).",
+          numeroPraMedir:
+            "Alcance por semana e clientes novos por mês — o painel lá embaixo mostra quantas pessoas você precisa alcançar pra sua meta.",
+          acoes: [
+            "Poste o produto, não o logo: vídeo curto montando o copo vende mais que arte bonita de feed.",
+            "Google Maps completo (fotos reais, horário certo, responder avaliações) — é onde o 'açaí perto de mim' te encontra de graça.",
+            "Impulsione anúncio nos dias quentes e fins de semana — anúncio amplifica desejo que já existe, não cria desejo no frio.",
+          ],
+        },
+        {
+          emoji: "🛒",
+          titulo: "Converter — transformar vontade em pedido",
+          oQueE: "Tirar todo o atrito: quem viu e quis precisa conseguir pedir em segundos, sem pensar.",
+          numeroPraMedir:
+            "Conversão: a cada 100 pessoas que veem, quantas pedem (ajuste o seu número real na aba Ajustes).",
+          acoes: [
+            "Cardápio simples: 3 combos prontos com preço fechado + a opção 'monte o seu'. Quem precisa escolher demais, desiste.",
+            "Oferta de primeira compra (ex.: 1 adicional grátis no primeiro pedido) pra destravar quem nunca provou o seu açaí.",
+            "Link de pedido fixado na bio do Instagram e WhatsApp que responde rápido — cada hora sem resposta é pedido no concorrente.",
+          ],
+        },
+        {
+          emoji: "🍧",
+          titulo: "Aumentar o copo — ticket médio",
+          oQueE: "O lucro do açaí mora nos adicionais e no tamanho. Vender mais pra quem já está comprando é a venda mais barata que existe.",
+          numeroPraMedir:
+            "Ticket médio — compare com a faixa de mercado na aba Meta e use a ancoragem de preço (final 9,90).",
+          acoes: [
+            "Sugira UM adicional na finalização de todo pedido ('quer Nutella por + R$ 4?'). Quem sugere, vende; quem não sugere, não vende.",
+            "Combo casal/família: mais volume num pedido só, com um custo de entrega único.",
+            "Monte a vitrine de preços com ancoragem: o tamanho do meio deve parecer o melhor negócio óbvio.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Fazer voltar — recompra",
+          oQueE: "Cliente que volta é venda sem custo de anúncio — é onde a margem do açaí realmente mora.",
+          numeroPraMedir:
+            "De cada 10 pedidos do mês, quantos são de quem já comprou antes? Anote toda semana — é o número mais importante da loja.",
+          acoes: [
+            "Cartão fidelidade simples (físico ou pelo WhatsApp): o 10º copo é grátis. Custa um copo, segura um cliente.",
+            "Lista VIP no WhatsApp com promoção exclusiva nos dias fracos (terça, quarta) — promoção pra quem já é fã, não pra estranho.",
+            "Peça avaliação no Google/iFood logo depois do pedido bom — avaliação de hoje é cliente novo de amanhã.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Chegou o inverno e a venda caiu",
+          realidade:
+            "Você não controla o clima — controla a sua esteira de produtos e a sua base de clientes. Reclamar do frio não paga boleto; cardápio de estação paga.",
+          caminho: [
+            "Crie a linha de inverno: itens de conforto (brownie com sorvete, bolo, chocolate, cremes) pra base fiel continuar comprando de você.",
+            "Aperte a recompra: no frio, promoção exclusiva pra lista VIP rende mais que anúncio pra estranho.",
+            "Use a baixa pra arrumar a casa — fornecedor, fotos, cardápio, treino de atendimento — e chegue no verão pronto pra colher.",
+          ],
+        },
+        {
+          problema: "Só vendo pelo iFood e a taxa come tudo",
+          realidade:
+            "Dentro do app, o cliente é da plataforma, não seu. A taxa é o aluguel dessa vitrine — cara demais pra ser sua única porta.",
+          caminho: [
+            "Use o app pra ser DESCOBERTO e migre o recorrente pro seu canal: bilhete no pedido com seu WhatsApp e um cupom pra pedir direto.",
+            "Retirada no balcão com vantagem (adicional grátis): sem taxa, sem entregador, cliente na sua loja.",
+            "Preço do app pode refletir a taxa (prática comum do mercado) — o desconto de pedir direto vira seu argumento.",
+          ],
+        },
+        {
+          problema: "Abriu um concorrente mais barato do lado",
+          realidade:
+            "Guerra de preço no açaí é corrida pro buraco: com CMV de ~40%, quem corta preço corta a própria margem. Você não controla o preço dele — controla o valor do seu copo.",
+          caminho: [
+            "Não iguale o preço: diferencie o copo — adicionais que ele não tem, padrão de qualidade, atendimento com nome e sorriso.",
+            "Deixe a ancoragem trabalhar: combos com final 9,90 e um tamanho 'premium' na vitrine que valoriza os do meio.",
+            "Sua lista VIP é sua muralha: quem se sente cliente da casa não troca você por R$ 2.",
+          ],
+        },
+        {
+          problema: "Não sei se estou ganhando dinheiro de verdade",
+          realidade:
+            "No açaí, a margem nasce ou morre no topping. Copo 'monte você mesmo' sem porção medida pode jogar seu CMV muito acima dos 40% sem você perceber.",
+          caminho: [
+            "Padronize e pese as porções de adicional — é a diferença entre lucro e prejuízo no mesmo copo.",
+            "Anote vendas e ticket toda semana (10 minutos) e confira o CMV real todo mês (insumos ÷ faturamento).",
+            "Jogue os números reais aqui na calculadora e compare com o plano — o desvio é o seu alarme antecipado.",
+          ],
+        },
+        {
+          problema: "Fim de mês do cliente = loja vazia",
+          realidade:
+            "A renda do seu bairro tem ciclo (5º dia útil, fim de mês apertado). Você não muda o salário de ninguém — muda a sua agenda de ofertas pra acompanhar o ciclo.",
+          caminho: [
+            "Crie um dia fixo de promoção na semana fraca (ex.: 'terça em dobro') — hábito enche loja vazia.",
+            "Combo de entrada mais barato no fim do mês; premium e lançamentos na primeira quinzena.",
+            "Programe impulsionamento pros dias que já são bons: anúncio amplifica movimento, não ressuscita dia morto.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "10 minutos",
+          acoes: [
+            "Anote: quantos pedidos, ticket médio, quantos clientes novos vs. que voltaram.",
+            "Compare com o plano do mês aqui na calculadora — está no ritmo?",
+            "Escolha UMA ação da esteira acima pra semana seguinte (uma bem feita > cinco pela metade).",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "30 minutos",
+          acoes: [
+            "Calcule o CMV real: tudo que gastou com insumos ÷ tudo que faturou.",
+            "Revise preços e combos — a ancoragem (final 9,90) continua em dia?",
+            "Teste UMA oferta nova e meça: repetiu resultado, vira rotina; não repetiu, descarta sem dó.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "auto-center",
