@@ -287,6 +287,150 @@ export const PRESETS: Preset[] = [
       { nome: "Revisão preventiva", pctReceita: 12, margem: 42 },
       { nome: "Diagnóstico", pctReceita: 9, margem: 72 },
     ],
+    estrategia: {
+      intro:
+        "Auto center não vive de serviço grande — vive de MUITOS serviços rodando rápido em vários elevadores. É a lógica do fast-food da mecânica: alinhamento, pneu, troca de óleo, ar-condicionado, revisão. O jogo é encher a agenda com produto-isca (jogo de pneu, alinhamento, amortecedor remanufaturado) e faturar no combo que sai do diagnóstico.",
+      principio:
+        "Você não controla o preço do pneu no fornecedor, nem se o cliente vai voltar amanhã. Controla a velocidade de giro do elevador, o mix de serviço por hora e a matemática do funil. Cada hora de elevador parada é R$ 50–150 de margem perdida — não estoca pra amanhã.",
+      cliente: {
+        quemE:
+          "Dono de carro popular ou intermediário, 25–55 anos, que quer resolver rápido, com preço fechado e sem sentir que foi enganado. Compara preço, mas escolhe pela confiança e pela indicação. Uma revisão bem feita = cliente pra sempre.",
+        ondeEsta:
+          "Google Maps (canal #1 — 'auto center perto de mim'), WhatsApp (onde a agenda fecha), Instagram/Facebook local (isca com preço grande), grupos de motorista de app e indicação de família.",
+        oQueEleQuer:
+          "Preço claro na comunicação, atendimento rápido, diagnóstico honesto (com foto/vídeo do problema), prazo cumprido e a sensação de ter feito bom negócio — principalmente quando é serviço-isca com preço abaixo do mercado.",
+      },
+      funil: [
+        {
+          emoji: "🎯",
+          titulo: "Produto-isca — quebra a inércia do cliente",
+          oQueE: "Jogo do pneu vendido quase no custo, alinhamento a R$ 40, kit de amortecedor remanufaturado. O isca não é onde você ganha — é onde você BUSCA o cliente. O lucro nasce no diagnóstico do carro que já está no elevador.",
+          numeroPraMedir: "% do faturamento total que vem do serviço adicional descoberto DEPOIS que o carro entrou pelo isca (meta: ≥ 60%).",
+          acoes: [
+            "Escolha 1–2 iscas com dor real e busca alta (jogo de pneu, alinhamento, amortecedor). Anuncia com preço grande no vídeo — cria efeito 'que absurdo isso, tenho que ir'.",
+            "Todo carro que entra pelo isca passa por um checklist rápido (freio, suspensão, bateria, correia, óleo). Orçamento adicional entregue impresso ANTES do carro sair do elevador.",
+            "Roda isca diferente a cada 60–90 dias pra manter a agenda cheia sem cansar o público. Inverno = ar-condicionado com preço fechado. Verão = revisão de viagem.",
+          ],
+        },
+        {
+          emoji: "🔍",
+          titulo: "Ser encontrado — Google Maps é seu vendedor #1",
+          oQueE: "Cliente com carro dando problema pega o celular e busca. Se você não aparece nos primeiros 3 com 4.7 estrelas, o próximo pneu é do concorrente.",
+          numeroPraMedir: "Cliques em 'ligar' e 'rotas' no Google Meu Negócio por semana.",
+          acoes: [
+            "Google Meu Negócio 100%: fotos do galpão, dos elevadores, do time, dos serviços. Horários certos. Categorias corretas (Auto Center + subcategorias).",
+            "Todo cliente satisfeito recebe pedido de review por WhatsApp na saída. Meta: 4.7+ com 200+ reviews.",
+            "Responda 100% das reviews (positivas e negativas). Review respondida certo vende mais que anúncio.",
+          ],
+        },
+        {
+          emoji: "💬",
+          titulo: "Contato ao agendamento — velocidade é tudo",
+          oQueE: "Auto center compete no minuto. Cliente com pneu careca ou carro batendo não espera 2h de retorno — ele já mandou pra 3 lugares.",
+          numeroPraMedir: "De cada 10 conversas, quantas viram agendamento firmado (data, hora, serviço).",
+          acoes: [
+            "Atendimento em até 5 min no comercial. Bot básico + humano dá conta. Fora do horário: mensagem automática com preço dos iscas + link de agendamento.",
+            "Ofereça só 2 horários por vez ('tenho amanhã 9h ou depois 14h?'). Decisão rápida = agenda fechada.",
+            "Registre TODO agendamento com fonte (Google, indicação, anúncio de isca). Você precisa saber qual real de anúncio traz cliente.",
+          ],
+        },
+        {
+          emoji: "🛎️",
+          titulo: "Comparecer + upsell no elevador",
+          oQueE: "Carro no elevador é 40 min de oportunidade. Diagnóstico rápido honesto + orçamento com foto = 60–75% de aprovação do adicional. Sem isso, é só o isca com margem zero.",
+          numeroPraMedir: "Taxa de aprovação do orçamento adicional (meta 55–75%) e ticket médio final.",
+          acoes: [
+            "Confirmação por WhatsApp 24h antes (reduz no-show em 30–50%).",
+            "Checklist visual padronizado (freio, suspensão, correia, bateria, óleo) em TODO carro que entra. Foto/vídeo do problema real vai pro WhatsApp do cliente.",
+            "Orçamento dividido em 'urgente / recomendado / pode esperar'. Preço fechado, prazo fechado. Aprovação por WhatsApp mesmo — cliente decide sem pressão presencial.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Base de clientes — receita previsível de verdade",
+          oQueE: "Carro precisa de manutenção previsível: óleo a cada 10 mil km, alinhamento a cada 6 meses, pneu a cada 40 mil. Se você lembra o cliente, ele volta. Se não, ele esquece — e o próximo pneu é do concorrente.",
+          numeroPraMedir: "% do faturamento vindo de clientes já cadastrados (meta 55–70%).",
+          acoes: [
+            "Cadastro: placa, KM, próxima troca, telefone. Sistema simples ou planilha funciona.",
+            "Lembrete automático por WhatsApp: 'olá João, seu HB20 tá em 6 meses do último alinhamento. Tenho quinta 10h ou sábado 8h'.",
+            "Programa 'cliente fidelidade': revisão anual a preço fechado, alinhamento cortesia. Trava recorrência anual previsível.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Elevador ocioso enquanto tem carro aguardando",
+          realidade:
+            "Gargalo não é elevador — é peça, mecânico livre ou aprovação do orçamento demorada. Você não controla o entregador, mas controla o estoque mínimo, a escala e a agilidade da comunicação.",
+          caminho: [
+            "Mapeie 30 itens de giro alto (óleo, filtro, pastilha, correia, pneu popular). Estoque mínimo desses NÃO negociável.",
+            "Dois fornecedores por categoria. Cotação em 10 min. O que entrega no dia leva.",
+            "Aprovação do adicional 100% por WhatsApp com foto — cliente aprova em minutos, elevador não espera.",
+          ],
+        },
+        {
+          problema: "Vendi muito isca e o mês não fechou",
+          realidade:
+            "Isca sem checklist e sem upsell é caridade. Você não controla se o carro precisa de mais serviço — controla se olhou pra descobrir e se ofereceu com clareza.",
+          caminho: [
+            "Meça o ticket médio dos carros que entraram pelo isca. Se está igual ao isca, você não fez o segundo passo — sem checklist, sem foto, sem orçamento adicional.",
+            "Padronize o checklist visual em TODO carro. Todo mecânico faz. Sem exceção.",
+            "Meta clara: % de carros de isca que fecham adicional (≥ 40%) e ticket médio final (≥ 2x o isca).",
+          ],
+        },
+        {
+          problema: "Concorrente cobra menos no pneu e virou preço de mercado",
+          realidade:
+            "Guerra de preço no pneu é a natureza do negócio — pneu é commodity. Você não vence a guerra do pneu; você vence com o COMBO (montagem + alinhamento + balanceamento + válvula).",
+          caminho: [
+            "Não venda pneu solto barato: venda combo com preço fechado e diferencial claro (alinhamento incluso, garantia).",
+            "Anuncie o combo, não o pneu unitário. 'Jogo de 4 com alinhamento por R$ X' vende mais que 'pneu por R$ Y'.",
+            "Diferencie por serviço: entrega em 40 min, agenda no WhatsApp, foto do serviço feito. Preço é 3º critério de decisão quando tem confiança.",
+          ],
+        },
+        {
+          problema: "Faturamento parece bom, mas o mês fecha ruim",
+          realidade:
+            "Auto center tem custo fixo alto (galpão, 3–5 mecânicos, ferramenta, luz). Ticket baixo com muito volume só fecha se o mix é bem trabalhado (alinhamento, ar-condicionado, diagnóstico têm margem 55–72%).",
+          caminho: [
+            "Preencha o mix de receita real na aba Ajustes. Se 'mecânica geral' é > 60%, mix está desequilibrado — margem baixa.",
+            "Aumente % dos serviços de margem alta: alinhamento, ar-condicionado, diagnóstico eletrônico. Anúncio isca por categoria pra puxar.",
+            "Calcule ponto de equilíbrio: quantos serviços/mês pra pagar tudo. É seu piso não-negociável.",
+          ],
+        },
+        {
+          problema: "Não sei quantas visualizações preciso pra encher os elevadores",
+          realidade:
+            "Sem contar visualização → contato → agendamento → carro que veio → orçamento aprovado, o faturamento é loteria. Receita previsível é matemática do funil, não fé.",
+          caminho: [
+            "Anote toda semana cada etapa: visualizações no Google/anúncio, cliques WhatsApp, agendamentos, carros que vieram, orçamentos aprovados, ticket médio.",
+            "Preencha as taxas na aba Ajustes — a calculadora mostra quantas VISUALIZAÇÕES por semana pra bater a meta.",
+            "Cada gargalo tem uma ação diferente: falta visualização = mais anúncio de isca. Falta agendamento = melhorar resposta. Falta aprovação = melhorar apresentação do orçamento.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "25 minutos",
+          acoes: [
+            "Feche números: carros atendidos, ticket médio, aprovação de orçamento, % vindo do isca, ocupação dos elevadores.",
+            "Confirme agenda da semana seguinte por WhatsApp.",
+            "Estoque dos 30 itens mais girados — reponha o que faltou.",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "1h 30min",
+          acoes: [
+            "Feche o funil completo (visualização → contato → agendamento → carro → orçamento aprovado) e compare com o Plano do mês.",
+            "Revise o mix de serviço por margem. Onde subir % de serviço de margem alta?",
+            "Escolha o próximo isca (roda a cada 60–90 dias). Prepare vídeo, arte, preço, checklist.",
+            "Rodada de follow-up: dispare lembrete de revisão / troca de óleo pra base de clientes vencida.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "oficina",
