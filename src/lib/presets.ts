@@ -406,6 +406,149 @@ export const PRESETS: Preset[] = [
       { nome: "Pediatria", ticket: 120 },
       { nome: "Cardiologia", ticket: 120 },
     ],
+    estrategia: {
+      intro:
+        "Clínica particular popular não vive de médico bom — vive de agenda cheia. E agenda cheia é resultado de conta simples: quantas pessoas veem, quantas ligam, quantas marcam, quantas comparecem, quantas voltam. O jogo é dominar essa conta e transformar em receita previsível.",
+      principio:
+        "Você não controla convênio, plano do governo nem o preço do concorrente da esquina. Controla a sua agenda, a taxa de comparecimento e o retorno do paciente. Receita previsível nasce quando cada etapa do funil vira número medido — não achismo.",
+      cliente: {
+        quemE:
+          "Paciente que não tem plano de saúde ou tem plano ruim, quer resolver rápido, preço acessível, sem burocracia. Decide por proximidade, indicação e reputação online. Sensível a preço, mas ainda mais sensível a demora e mau atendimento.",
+        ondeEsta:
+          "Google (busca 'clínica popular perto de mim'), Google Maps e reviews, Instagram/Facebook local, WhatsApp (onde a consulta é agendada de verdade) e boca-a-boca do bairro.",
+        oQueEleQuer:
+          "Preço claro no anúncio, atendimento rápido no WhatsApp, horário perto do trabalho ou fim de tarde, médico que escuta e resultado (receita, exame pedido) na hora — não 'volta na semana que vem pra ver o exame'.",
+      },
+      funil: [
+        {
+          emoji: "🔍",
+          titulo: "Ser encontrado — quem procura precisa achar você",
+          oQueE: "Consulta popular é procurada, não empurrada. Se você não aparece no Google e no Maps quando alguém busca, não existe.",
+          numeroPraMedir: "Visualizações no Google Meu Negócio e cliques no botão 'ligar/WhatsApp' por semana.",
+          acoes: [
+            "Google Meu Negócio 100% completo: fotos reais da clínica, especialidades, preços de consulta, horário. É seu maior gerador de lead gratuito.",
+            "Peça avaliação no Google a todo paciente satisfeito no fim da consulta — meta: 4,7+ estrelas com 100+ reviews.",
+            "Anúncio pago local no Google e Instagram por raio (3–5 km) por especialidade — preço no anúncio filtra quem já aceita seu ticket.",
+          ],
+        },
+        {
+          emoji: "💬",
+          titulo: "Virar contato — do clique ao WhatsApp",
+          oQueE: "Quem viu e não escreveu, esqueceu. Cada segundo de atrito entre 'quero marcar' e 'consegui falar com alguém' vira paciente do concorrente.",
+          numeroPraMedir: "De 10 visitantes do Google, quantos chamam no WhatsApp/telefone.",
+          acoes: [
+            "Botão de WhatsApp em tudo: Google, site, Instagram. Nada de formulário de contato.",
+            "Resposta em até 5 minutos no horário comercial. Mais que isso, taxa de agendamento despenca.",
+            "Script de resposta pronto: cumprimento + especialidade disponível + preço + próximos 3 horários. Fecha na primeira mensagem.",
+          ],
+        },
+        {
+          emoji: "📅",
+          titulo: "Agendar — transformar interesse em compromisso",
+          oQueE: "'Vou ver com a família e volto' é 80% de perda. Agendamento firme tem data, hora e, idealmente, confirmação por WhatsApp.",
+          numeroPraMedir: "De 10 conversas no WhatsApp, quantas viram consulta marcada.",
+          acoes: [
+            "Ofereça só 2 horários por vez ('tenho quarta 15h ou quinta 10h, qual prefere?') — mais opções paralisam a decisão.",
+            "Preço fechado sem pegadinha na hora de agendar. Se tem taxa de retorno grátis, diga na hora — isso fecha venda.",
+            "Registre TODO agendamento numa planilha ou sistema simples com fonte (Google, indicação, Instagram): você precisa saber de onde vem cada consulta.",
+          ],
+        },
+        {
+          emoji: "🚪",
+          titulo: "Comparecer — combater o no-show",
+          oQueE: "Agenda cheia com 30% de faltosos é agenda de mentira. Cadeira vazia com médico esperando é o custo mais alto da clínica.",
+          numeroPraMedir: "Taxa de comparecimento: agendados que efetivamente vieram ÷ total agendado.",
+          acoes: [
+            "Confirmação automática por WhatsApp 24h antes: 'confirma sua consulta amanhã 15h respondendo SIM'. Quem não confirma, libera a vaga.",
+            "Overbooking calculado nos horários de pico: se historicamente falta 20%, agende 20% a mais nesse horário.",
+            "Lista de espera ativa: sempre 3–5 pacientes prontos pra encaixar quando alguém desmarca.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Fazer voltar — retorno e recorrência",
+          oQueE: "Paciente satisfeito vira exame, retorno e indicação — sem custo de anúncio nenhum. É onde a margem real da clínica mora.",
+          numeroPraMedir: "% de consultas do mês que são retorno vs. primeira vez.",
+          acoes: [
+            "Já saia da consulta com o próximo passo agendado: exame, retorno, encaminhamento. Não deixe pro paciente 'ligar depois'.",
+            "Pacote de acompanhamento por doença crônica (hipertensão, diabetes, dermatologia estética): receita recorrente previsível.",
+            "Programa de indicação: paciente que indica alguém que consulta ganha desconto no próximo retorno.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Agenda parece cheia mas o dia rende pouco (muito no-show)",
+          realidade:
+            "Você não controla se o paciente vai comparecer — controla a confirmação, o overbooking e a lista de espera. No-show ignorado é caixa jogado fora todo dia.",
+          caminho: [
+            "Meça a taxa por dia da semana / horário. Segunda de manhã falta mais que quinta à tarde? Ajuste overbooking.",
+            "Confirmação automática 24h antes é obrigatória. Quem não confirmar em X horas, a vaga é oferecida à lista de espera.",
+            "Considere cobrar taxa simbólica de reserva descontada na consulta — reduz no-show sem afastar quem realmente quer vir.",
+          ],
+        },
+        {
+          problema: "Concorrente abriu do lado cobrando R$ 20 a menos",
+          realidade:
+            "Guerra de preço em clínica popular é corrida pra baixo — quem ganha é quem tem escala. Você não controla o preço dele; controla a experiência da sua consulta.",
+          caminho: [
+            "Diferencie no atendimento: WhatsApp que responde rápido, agenda no dia, médico que escuta 20 minutos, receita entregue impressa.",
+            "Combos: consulta + retorno grátis em 30 dias. Percepção de valor sobe sem cortar preço.",
+            "Reforce reviews (Google, redes) — reputação alta justifica R$ 20 a mais sem discussão.",
+          ],
+        },
+        {
+          problema: "Fatura bem, mas o mês fecha no vermelho",
+          realidade:
+            "Clínica tem custo fixo alto (aluguel, secretárias, médicos plantão). Ticket popular só fecha conta com volume. Se falta paciente, o custo devora tudo.",
+          caminho: [
+            "Calcule o ponto de equilíbrio na aba Ajustes: quantas consultas/mês pra pagar toda a estrutura. Esse é seu 'não posso vender menos que isso'.",
+            "Especialidades com procedimento (dermato, ginecologia) sobem o ticket médio sem precisar mais paciente.",
+            "Contrate médico como PJ por consulta (não por plantão fixo) enquanto a agenda não trava — variabiliza o custo.",
+          ],
+        },
+        {
+          problema: "Não sei de onde vem meu paciente",
+          realidade:
+            "Se você anuncia em 4 lugares e não sabe qual traz consulta, está queimando dinheiro em 3 e nem sabe qual. Sem medir a fonte, não dá pra decidir onde investir.",
+          caminho: [
+            "Toda ligação/WhatsApp: 'como você nos conheceu?' vira campo obrigatório no agendamento.",
+            "Números de WhatsApp diferentes por canal (um pro Instagram, um pro Google) — a origem se mede sozinha.",
+            "Fim do mês: agrupe consultas por fonte. Corte o que não traz, dobre o que traz.",
+          ],
+        },
+        {
+          problema: "Médico bom pediu pra sair porque a agenda dele não estava cheia",
+          realidade:
+            "Médico não fica onde não fatura. Você não controla a lealdade dele — controla a agenda que oferece. Especialidade sem demanda é problema de captação, não do profissional.",
+          caminho: [
+            "Antes de contratar especialidade nova, faça 1 mês de anúncio pra medir demanda real do bairro.",
+            "Comece o especialista com 1–2 dias/semana e só aumente quando a agenda encher.",
+            "Divulgue a agenda do especialista individualmente — foto, currículo, WhatsApp direto. Especialista com marca própria enche mais.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "20 minutos",
+          acoes: [
+            "Extraia da planilha: consultas realizadas, no-show, ticket médio, fonte de cada paciente novo.",
+            "Confirme agenda da semana seguinte: quem não confirmou perde vaga.",
+            "Compare com o Plano do mês — está no ritmo?",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "1 hora",
+          acoes: [
+            "Feche o funil: visualizações → contatos → agendamentos → comparecimentos → retornos. Onde afunila mais?",
+            "Revise custos fixos e ponto de equilíbrio na aba Ajustes.",
+            "Peça 20 reviews no Google (SMS/WhatsApp pros pacientes satisfeitos do mês).",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "pequeno-produtor",
