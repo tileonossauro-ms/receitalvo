@@ -347,6 +347,149 @@ export const PRESETS: Preset[] = [
       "CMV (insumos): 5–10%.",
       "Taxa de cartão: 2–3%.",
     ],
+    estrategia: {
+      intro:
+        "Salão que fatura bem não é o que tem melhor tesoura — é o que tem a cadeira ocupada. Cada hora-cadeira parada é margem que não volta. O jogo é encher a agenda com serviços de ticket alto, transformar cliente novo em fixo e ter uma matemática clara: quantas pessoas veem → chamam → agendam → comparecem → voltam.",
+      principio:
+        "Você não controla se choveu, se a cliente atrasou ou se a profissional pediu folga. Controla a agenda, o mix de serviços, a política de no-show e a comunicação com a base. Receita previsível de salão é agenda cheia com combos — não é 'quem apareceu, apareceu'.",
+      cliente: {
+        quemE:
+          "Mulher (majoritariamente) 20–55, decisão por indicação, Instagram e proximidade. Escolhe salão por tesoura/mão específica, não pela marca. Fiel enquanto a profissional dela estiver lá — e sensível à experiência, não só ao preço.",
+        ondeEsta:
+          "Instagram (feed e stories da profissional dela — mais que o do salão), WhatsApp (onde a agenda fecha), Google Maps (busca 'salão perto de mim') e indicação amiga (canal #1 do salão pequeno).",
+        oQueEleQuer:
+          "Foto de resultado real (não só logo), horário que caiba no dia dela, profissional que já conhece o gosto dela, atendimento sem espera e a sensação de sair melhor do que entrou (não só 'feito').",
+      },
+      funil: [
+        {
+          emoji: "📸",
+          titulo: "Ser visto — feed que vende agenda",
+          oQueE: "Cliente novo de salão nasce vendo um resultado bonito de alguém real. Feed com só foto de marca e propaganda não gera lead.",
+          numeroPraMedir: "Cliques no WhatsApp/link de agenda por semana no Instagram/Google.",
+          acoes: [
+            "Cada profissional posta seu próprio antes-e-depois: quem viu a mão dela é quem vai marcar com ela.",
+            "Google Meu Negócio completo (fotos reais, serviços, horário, avaliações). É de graça e capta 'salão perto de mim'.",
+            "Story diário mostrando bastidor + agenda da semana com 'ainda tem vaga na quinta às 15h'.",
+          ],
+        },
+        {
+          emoji: "💬",
+          titulo: "Virar contato — botão de agenda em tudo",
+          oQueE: "Cliente não liga mais. Se não tem WhatsApp em 1 clique, ela vai no salão que tem.",
+          numeroPraMedir: "De 10 pessoas que viram o post, quantas mandam mensagem.",
+          acoes: [
+            "Link de WhatsApp na bio, nos stories e nas fotos de resultado.",
+            "Resposta em minutos no comercial (bot básico + humano). No salão, a agenda é ganha pela velocidade.",
+            "Mensagem de boas-vindas com os 3 serviços mais buscados e preço — reduz 5 mensagens de 'quanto custa?'.",
+          ],
+        },
+        {
+          emoji: "📅",
+          titulo: "Agendar com combo — subir o ticket na porta",
+          oQueE: "Agendou só corte? Perdeu R$ 80 de escova, R$ 150 de coloração. O momento de subir ticket é ANTES da cadeira, não depois.",
+          numeroPraMedir: "Ticket médio por agendamento (aba Ajustes) vs. ticket do serviço solo.",
+          acoes: [
+            "Combos prontos com nome e desconto simbólico: 'Combo Cliente Nova' (corte + hidratação), 'Combo Formatura' (mão+pé+escova).",
+            "Sempre sugira o combo no agendamento: 'faz junto a hidratação? Fica 20% mais barato que separado'.",
+            "Serviços premium (progressiva, alongamento, coloração fantasia) precisam de foto no cardápio e destaque no story.",
+          ],
+        },
+        {
+          emoji: "🚪",
+          titulo: "Comparecer — combater no-show",
+          oQueE: "Cadeira reservada + cliente que sumiu = maior custo escondido do salão. Uma hora-cadeira vazia é R$ 100–200 que não voltam.",
+          numeroPraMedir: "Taxa de no-show por dia da semana e por profissional.",
+          acoes: [
+            "Confirmação por WhatsApp 24h antes: 'confirma seu horário?'. Quem não responde, avisa que perde a vaga.",
+            "Sinal de agendamento pra novo cliente ou serviço acima de X reais (via Pix, desconta no atendimento).",
+            "Lista de espera ativa: 2–3 clientes 'a fim de encaixe' que você chama quando alguém desmarca.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Fazer voltar — recorrência é o ouro do salão",
+          oQueE: "Cliente que volta a cada 30–45 dias fez a matemática do salão fechar. Cliente que fez uma vez e sumiu foi custo puro de aquisição.",
+          numeroPraMedir: "% da agenda que é retorno (mesmo cliente) vs. primeira vez.",
+          acoes: [
+            "Já saia do atendimento com o próximo agendado — nunca 'me chama quando quiser'.",
+            "Pacote: 4 escovas com desconto, 6 hidratações pré-pagas. Trava recorrência e caixa antecipado.",
+            "Lembrete automático 25 dias depois: 'já tá na hora do retoque, tenho quarta 15h ou sexta 10h?'.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Profissional saiu e levou a cartela de clientes",
+          realidade:
+            "Se a base de contato mora no celular pessoal da profissional, ela é dona da carteira — não você. Você não controla o coração dela, mas controla de quem é a base.",
+          caminho: [
+            "Contatos ficam SEMPRE no CRM/agenda do salão (Trinks, Booksy, planilha), nunca só no WhatsApp pessoal.",
+            "Comunicação institucional (lembretes, promoções) sai do número do salão, não do pessoal.",
+            "Contrato de partnership com cláusula clara: base é do salão. Discutível, mas essencial pra pequeno salão.",
+          ],
+        },
+        {
+          problema: "Agenda parece cheia e o mês fecha ruim",
+          realidade:
+            "Comissão de 50% + insumo + cartão + aluguel deixa margem apertadíssima em serviço solo. Se o ticket não sobe com combo, o volume não resolve.",
+          caminho: [
+            "Meça o ticket médio real na aba Ajustes. Se está abaixo do meio da faixa, foco em combo e cross-sell no agendamento.",
+            "Serviços premium (química, coloração, alongamento) precisam representar % maior da agenda pra fechar o mês.",
+            "Revise custos fixos (aluguel, luz, insumo). Aluguel percentual > 25% do faturamento é sinal amarelo.",
+          ],
+        },
+        {
+          problema: "Cliente sumiu depois do primeiro atendimento",
+          realidade:
+            "Salão que não trabalha recompra é salão que gasta em anúncio pra pagar o cliente do concorrente. Você não controla a rotina dela, mas controla o próximo agendamento na saída.",
+          caminho: [
+            "Regra do salão: cliente sai do atendimento com o próximo já agendado. Meta: 60%+ saem com retorno marcado.",
+            "Follow-up manual 15 dias depois: 'como ficou o cabelo?'. Simples e reativa.",
+            "Peça avaliação Google/Instagram na saída do atendimento — reforça o vínculo e traz cliente novo.",
+          ],
+        },
+        {
+          problema: "Muito no-show, principalmente na segunda de manhã",
+          realidade:
+            "Você não controla o compromisso dela, mas controla a política de agendamento. Cadeira parada por falta é dinheiro que não estoca — o horário passou.",
+          caminho: [
+            "Confirmação automática 24h antes obrigatória. Sem confirmação, vaga é liberada.",
+            "Horários de risco (segunda cedo, feriado próximo) só com sinal Pix — filtra quem tá comprometido.",
+            "Overbooking calculado nos horários de alta taxa histórica: 20% de falta? Agenda 20% a mais.",
+          ],
+        },
+        {
+          problema: "Não sei quantos posts / anúncios preciso pra encher a agenda",
+          realidade:
+            "Sem medir visualização → contato → agendamento → comparecimento, cada real de anúncio é fé. Receita previsível de salão é a matemática do funil, não a força do dedão.",
+          caminho: [
+            "Marque toda semana: cliques no WhatsApp, agendamentos novos, taxa de comparecimento.",
+            "Preencha as conversões na aba Ajustes — a calculadora mostra quantos leads/semana pra bater a meta.",
+            "O gargalo aparece sozinho: pouco lead? Falta post/anúncio. Muito lead e pouca agenda? Falha na resposta. Muita agenda e faturamento baixo? Falta combo.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "20 minutos",
+          acoes: [
+            "Feche os números: agendamentos, comparecimentos, ticket médio, retorno vs. novos.",
+            "Confirme a agenda da semana seguinte.",
+            "Post de resultado + story com vagas em aberto.",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "1 hora",
+          acoes: [
+            "Ranking de serviço e de profissional (ticket, retorno, comparecimento). Ajuste comissão / horário de acordo.",
+            "Feche o funil (visualização → agendamento → comparecimento) e compare com o Plano do mês.",
+            "Revise combos e crie 1 promoção pra dia/horário mais fraco da semana.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "quiosque",
