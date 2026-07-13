@@ -287,6 +287,150 @@ export const PRESETS: Preset[] = [
       { nome: "Revisão preventiva", pctReceita: 12, margem: 42 },
       { nome: "Diagnóstico", pctReceita: 9, margem: 72 },
     ],
+    estrategia: {
+      intro:
+        "Auto center não vive de serviço grande — vive de MUITOS serviços rodando rápido em vários elevadores. É a lógica do fast-food da mecânica: alinhamento, pneu, troca de óleo, ar-condicionado, revisão. O jogo é encher a agenda com produto-isca (jogo de pneu, alinhamento, amortecedor remanufaturado) e faturar no combo que sai do diagnóstico.",
+      principio:
+        "Você não controla o preço do pneu no fornecedor, nem se o cliente vai voltar amanhã. Controla a velocidade de giro do elevador, o mix de serviço por hora e a matemática do funil. Cada hora de elevador parada é R$ 50–150 de margem perdida — não estoca pra amanhã.",
+      cliente: {
+        quemE:
+          "Dono de carro popular ou intermediário, 25–55 anos, que quer resolver rápido, com preço fechado e sem sentir que foi enganado. Compara preço, mas escolhe pela confiança e pela indicação. Uma revisão bem feita = cliente pra sempre.",
+        ondeEsta:
+          "Google Maps (canal #1 — 'auto center perto de mim'), WhatsApp (onde a agenda fecha), Instagram/Facebook local (isca com preço grande), grupos de motorista de app e indicação de família.",
+        oQueEleQuer:
+          "Preço claro na comunicação, atendimento rápido, diagnóstico honesto (com foto/vídeo do problema), prazo cumprido e a sensação de ter feito bom negócio — principalmente quando é serviço-isca com preço abaixo do mercado.",
+      },
+      funil: [
+        {
+          emoji: "🎯",
+          titulo: "Produto-isca — quebra a inércia do cliente",
+          oQueE: "Jogo do pneu vendido quase no custo, alinhamento a R$ 40, kit de amortecedor remanufaturado. O isca não é onde você ganha — é onde você BUSCA o cliente. O lucro nasce no diagnóstico do carro que já está no elevador.",
+          numeroPraMedir: "% do faturamento total que vem do serviço adicional descoberto DEPOIS que o carro entrou pelo isca (meta: ≥ 60%).",
+          acoes: [
+            "Escolha 1–2 iscas com dor real e busca alta (jogo de pneu, alinhamento, amortecedor). Anuncia com preço grande no vídeo — cria efeito 'que absurdo isso, tenho que ir'.",
+            "Todo carro que entra pelo isca passa por um checklist rápido (freio, suspensão, bateria, correia, óleo). Orçamento adicional entregue impresso ANTES do carro sair do elevador.",
+            "Roda isca diferente a cada 60–90 dias pra manter a agenda cheia sem cansar o público. Inverno = ar-condicionado com preço fechado. Verão = revisão de viagem.",
+          ],
+        },
+        {
+          emoji: "🔍",
+          titulo: "Ser encontrado — Google Maps é seu vendedor #1",
+          oQueE: "Cliente com carro dando problema pega o celular e busca. Se você não aparece nos primeiros 3 com 4.7 estrelas, o próximo pneu é do concorrente.",
+          numeroPraMedir: "Cliques em 'ligar' e 'rotas' no Google Meu Negócio por semana.",
+          acoes: [
+            "Google Meu Negócio 100%: fotos do galpão, dos elevadores, do time, dos serviços. Horários certos. Categorias corretas (Auto Center + subcategorias).",
+            "Todo cliente satisfeito recebe pedido de review por WhatsApp na saída. Meta: 4.7+ com 200+ reviews.",
+            "Responda 100% das reviews (positivas e negativas). Review respondida certo vende mais que anúncio.",
+          ],
+        },
+        {
+          emoji: "💬",
+          titulo: "Contato ao agendamento — velocidade é tudo",
+          oQueE: "Auto center compete no minuto. Cliente com pneu careca ou carro batendo não espera 2h de retorno — ele já mandou pra 3 lugares.",
+          numeroPraMedir: "De cada 10 conversas, quantas viram agendamento firmado (data, hora, serviço).",
+          acoes: [
+            "Atendimento em até 5 min no comercial. Bot básico + humano dá conta. Fora do horário: mensagem automática com preço dos iscas + link de agendamento.",
+            "Ofereça só 2 horários por vez ('tenho amanhã 9h ou depois 14h?'). Decisão rápida = agenda fechada.",
+            "Registre TODO agendamento com fonte (Google, indicação, anúncio de isca). Você precisa saber qual real de anúncio traz cliente.",
+          ],
+        },
+        {
+          emoji: "🛎️",
+          titulo: "Comparecer + upsell no elevador",
+          oQueE: "Carro no elevador é 40 min de oportunidade. Diagnóstico rápido honesto + orçamento com foto = 60–75% de aprovação do adicional. Sem isso, é só o isca com margem zero.",
+          numeroPraMedir: "Taxa de aprovação do orçamento adicional (meta 55–75%) e ticket médio final.",
+          acoes: [
+            "Confirmação por WhatsApp 24h antes (reduz no-show em 30–50%).",
+            "Checklist visual padronizado (freio, suspensão, correia, bateria, óleo) em TODO carro que entra. Foto/vídeo do problema real vai pro WhatsApp do cliente.",
+            "Orçamento dividido em 'urgente / recomendado / pode esperar'. Preço fechado, prazo fechado. Aprovação por WhatsApp mesmo — cliente decide sem pressão presencial.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Base de clientes — receita previsível de verdade",
+          oQueE: "Carro precisa de manutenção previsível: óleo a cada 10 mil km, alinhamento a cada 6 meses, pneu a cada 40 mil. Se você lembra o cliente, ele volta. Se não, ele esquece — e o próximo pneu é do concorrente.",
+          numeroPraMedir: "% do faturamento vindo de clientes já cadastrados (meta 55–70%).",
+          acoes: [
+            "Cadastro: placa, KM, próxima troca, telefone. Sistema simples ou planilha funciona.",
+            "Lembrete automático por WhatsApp: 'olá João, seu HB20 tá em 6 meses do último alinhamento. Tenho quinta 10h ou sábado 8h'.",
+            "Programa 'cliente fidelidade': revisão anual a preço fechado, alinhamento cortesia. Trava recorrência anual previsível.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Elevador ocioso enquanto tem carro aguardando",
+          realidade:
+            "Gargalo não é elevador — é peça, mecânico livre ou aprovação do orçamento demorada. Você não controla o entregador, mas controla o estoque mínimo, a escala e a agilidade da comunicação.",
+          caminho: [
+            "Mapeie 30 itens de giro alto (óleo, filtro, pastilha, correia, pneu popular). Estoque mínimo desses NÃO negociável.",
+            "Dois fornecedores por categoria. Cotação em 10 min. O que entrega no dia leva.",
+            "Aprovação do adicional 100% por WhatsApp com foto — cliente aprova em minutos, elevador não espera.",
+          ],
+        },
+        {
+          problema: "Vendi muito isca e o mês não fechou",
+          realidade:
+            "Isca sem checklist e sem upsell é caridade. Você não controla se o carro precisa de mais serviço — controla se olhou pra descobrir e se ofereceu com clareza.",
+          caminho: [
+            "Meça o ticket médio dos carros que entraram pelo isca. Se está igual ao isca, você não fez o segundo passo — sem checklist, sem foto, sem orçamento adicional.",
+            "Padronize o checklist visual em TODO carro. Todo mecânico faz. Sem exceção.",
+            "Meta clara: % de carros de isca que fecham adicional (≥ 40%) e ticket médio final (≥ 2x o isca).",
+          ],
+        },
+        {
+          problema: "Concorrente cobra menos no pneu e virou preço de mercado",
+          realidade:
+            "Guerra de preço no pneu é a natureza do negócio — pneu é commodity. Você não vence a guerra do pneu; você vence com o COMBO (montagem + alinhamento + balanceamento + válvula).",
+          caminho: [
+            "Não venda pneu solto barato: venda combo com preço fechado e diferencial claro (alinhamento incluso, garantia).",
+            "Anuncie o combo, não o pneu unitário. 'Jogo de 4 com alinhamento por R$ X' vende mais que 'pneu por R$ Y'.",
+            "Diferencie por serviço: entrega em 40 min, agenda no WhatsApp, foto do serviço feito. Preço é 3º critério de decisão quando tem confiança.",
+          ],
+        },
+        {
+          problema: "Faturamento parece bom, mas o mês fecha ruim",
+          realidade:
+            "Auto center tem custo fixo alto (galpão, 3–5 mecânicos, ferramenta, luz). Ticket baixo com muito volume só fecha se o mix é bem trabalhado (alinhamento, ar-condicionado, diagnóstico têm margem 55–72%).",
+          caminho: [
+            "Preencha o mix de receita real na aba Ajustes. Se 'mecânica geral' é > 60%, mix está desequilibrado — margem baixa.",
+            "Aumente % dos serviços de margem alta: alinhamento, ar-condicionado, diagnóstico eletrônico. Anúncio isca por categoria pra puxar.",
+            "Calcule ponto de equilíbrio: quantos serviços/mês pra pagar tudo. É seu piso não-negociável.",
+          ],
+        },
+        {
+          problema: "Não sei quantas visualizações preciso pra encher os elevadores",
+          realidade:
+            "Sem contar visualização → contato → agendamento → carro que veio → orçamento aprovado, o faturamento é loteria. Receita previsível é matemática do funil, não fé.",
+          caminho: [
+            "Anote toda semana cada etapa: visualizações no Google/anúncio, cliques WhatsApp, agendamentos, carros que vieram, orçamentos aprovados, ticket médio.",
+            "Preencha as taxas na aba Ajustes — a calculadora mostra quantas VISUALIZAÇÕES por semana pra bater a meta.",
+            "Cada gargalo tem uma ação diferente: falta visualização = mais anúncio de isca. Falta agendamento = melhorar resposta. Falta aprovação = melhorar apresentação do orçamento.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "25 minutos",
+          acoes: [
+            "Feche números: carros atendidos, ticket médio, aprovação de orçamento, % vindo do isca, ocupação dos elevadores.",
+            "Confirme agenda da semana seguinte por WhatsApp.",
+            "Estoque dos 30 itens mais girados — reponha o que faltou.",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "1h 30min",
+          acoes: [
+            "Feche o funil completo (visualização → contato → agendamento → carro → orçamento aprovado) e compare com o Plano do mês.",
+            "Revise o mix de serviço por margem. Onde subir % de serviço de margem alta?",
+            "Escolha o próximo isca (roda a cada 60–90 dias). Prepare vídeo, arte, preço, checklist.",
+            "Rodada de follow-up: dispare lembrete de revisão / troca de óleo pra base de clientes vencida.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "oficina",
@@ -314,6 +458,150 @@ export const PRESETS: Preset[] = [
       "Taxa de conversão de orçamento em serviço: 55–75%.",
       "Faturamento por elevador: R$ 10.000–25.000/mês.",
     ],
+    estrategia: {
+      intro:
+        "Oficina não fatura por hora aberta — fatura por hora com carro NO elevador rodando. Cada elevador parado é R$ 30–80/h de margem que evaporou. O jogo é velocidade de giro: quanto mais rápido um serviço entra, sai e libera o elevador pro próximo, maior o faturamento — sem contratar mais ninguém nem alugar mais espaço.",
+      principio:
+        "Você não controla se vai chover, se o cliente vai atrasar ou se a peça vai chegar tarde. Controla o giro do elevador, o produto-isca que enche a agenda e a matemática do funil (quantos veem → chamam → agendam → vêm → viram serviço). Faturamento previsível é agenda cheia + giro alto + ticket bem trabalhado.",
+      cliente: {
+        quemE:
+          "Dono do carro entre 25 e 55 anos, popular a médio, que só liga pra oficina quando o carro deu problema OU quando o pneu tá careca. Decide por preço + confiança + proximidade. Uma boa experiência vira cliente pra 5–10 anos.",
+        ondeEsta:
+          "Google Maps ('oficina mecânica perto de mim' — canal #1), WhatsApp (onde a agenda fecha), Instagram/Facebook local (reviews e resultado) e indicação (motorista de app, colega de trabalho).",
+        oQueEleQuer:
+          "Diagnóstico honesto (não empurrar serviço que não precisa), preço fechado antes de aprovar, prazo cumprido, carro pronto quando prometeu e — quando é serviço-isca — sensação clara de barganha.",
+      },
+      funil: [
+        {
+          emoji: "🎯",
+          titulo: "Produto-isca — traz cliente por preço, fatura no combo",
+          oQueE: "Oficina cheia começa com uma oferta imperdível que puxa o carro pra dentro. Jogo do pneu, alinhamento a preço quase de custo, amortecedor remanufaturado — vender o isca 'no negativo' pra elevador não parar. O lucro vem no que descobre no diagnóstico DEPOIS que o carro está lá.",
+          numeroPraMedir: "Ticket médio final dos clientes que vieram pelo isca (deve ser 2–4x o preço do isca).",
+          acoes: [
+            "Escolha 1 produto-isca com dor real e frequência: jogo de pneu com alinhamento incluso, kit de amortecedor remanufaturado, revisão dos 20 mil por preço fechado.",
+            "Anuncie o isca com preço grande e vídeo curto explicando (Instagram + Facebook local + Google). Anúncio de isca não é despesa, é aquisição de cliente.",
+            "TODO carro que entra pelo isca passa por diagnóstico rápido de 15 min (freio, suspensão, correia, óleo). Orçamento adicional entregue impresso ANTES do carro sair.",
+          ],
+        },
+        {
+          emoji: "🔍",
+          titulo: "Ser encontrado — Google Maps é seu maior vendedor",
+          oQueE: "Oficina não vive de branding, vive de emergência. Quando o carro quebra, a pessoa pega o celular e busca 'oficina perto de mim'. Se você não está lá com 4.7 estrelas, o cliente é do outro.",
+          numeroPraMedir: "Cliques em 'ligar' e 'rotas' no Google Meu Negócio por semana.",
+          acoes: [
+            "Google Meu Negócio 100% completo: fotos reais da oficina, dos serviços, do time. Horário certo. Serviços listados.",
+            "TODO cliente satisfeito recebe pedido de review por WhatsApp na saída. Meta: 4.7+ com 100+ reviews.",
+            "Responda TODA avaliação, principalmente as negativas — respondida certo, review ruim vira credibilidade.",
+          ],
+        },
+        {
+          emoji: "💬",
+          titulo: "Do contato ao agendamento firme",
+          oQueE: "'Passa aí quando puder' é agenda fantasma — vira dia com elevador vazio. Agendamento de verdade tem data, hora, serviço e (idealmente) confirmação.",
+          numeroPraMedir: "De cada 10 conversas no WhatsApp/telefone, quantas viram agendamento com hora marcada.",
+          acoes: [
+            "Resposta em minutos no comercial. Cliente com carro parado não espera 2h.",
+            "Ofereça só 2 horários por vez ('tenho quarta 8h ou quinta 14h?') — decisão rápida.",
+            "Registre TODO agendamento numa planilha/agenda digital com fonte (Google, indicação, anúncio). Você precisa saber quem traz cliente.",
+          ],
+        },
+        {
+          emoji: "🛠️",
+          titulo: "Aprovação do orçamento — a venda de verdade",
+          oQueE: "O carro no elevador é uma oportunidade de 40 minutos de conversa. Diagnóstico bem feito + orçamento claro + confiança = orçamento aprovado. Sem isso, é só o serviço mínimo e o cliente vai embora.",
+          numeroPraMedir: "% dos orçamentos apresentados que são aprovados (meta 55–75%).",
+          acoes: [
+            "Orçamento por escrito com foto/vídeo do problema real no carro (WhatsApp). Ver a peça gasta vende sozinho.",
+            "Divida em 'urgente / recomendado / pode esperar' — cliente compra confiança, não empurrão.",
+            "Preço fechado, prazo fechado. Passou disso, você absorve. Cliente que confia volta e indica.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Retorno e recorrência — a mina de ouro escondida",
+          oQueE: "Carro precisa de manutenção a cada 6–12 meses. Cliente da base é venda sem custo de aquisição — mas some se você não lembrar dele.",
+          numeroPraMedir: "% do faturamento vindo de cliente que já esteve na oficina (meta 55–70%).",
+          acoes: [
+            "Cadastre TODO carro que entra: placa, KM, próxima troca de óleo/correia. Sistema simples ou planilha basta.",
+            "Lembrete automático por WhatsApp: 'olá João, seu Onix bateu 6 meses da revisão. Tenho terça 10h ou sábado 8h'.",
+            "Programa 'cliente da casa': revisão anual a preço fechado, alinhamento incluso. Vira renda recorrente previsível.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Elevador ficou parado 3 dias esperando peça",
+          realidade:
+            "Cada dia de elevador parado é R$ 300–800 de margem perdida — e não volta. Você não controla o entregador da autopeça, mas controla o estoque mínimo, o fornecedor B e a política de aprovação.",
+          caminho: [
+            "Mapeie os 20 itens mais usados (óleo, filtro, pastilha, correia mais comum). Estoque mínimo desses NÃO negociável.",
+            "Sempre tenha 2 fornecedores por categoria. Cotação em 10 min pelos dois. O que entrega no dia leva a compra.",
+            "Só aprove orçamento com peça garantida no estoque OU chegada confirmada em 24h. Enquanto isso, prioriza outro carro no elevador.",
+          ],
+        },
+        {
+          problema: "Concorrente novo abriu cobrando metade e roubou cliente",
+          realidade:
+            "Guerra de preço em oficina é corrida pro buraco: se você corta 30%, corta 100% da margem. Você não controla ele — controla seu diferencial e seu produto-isca.",
+          caminho: [
+            "Você também tem seu isca: alinhamento a R$ 40, jogo de pneu com margem zero. Isca traz o cliente; o carro no elevador gera o ticket alto.",
+            "Diferencie por confiança visível: foto/vídeo da peça trocada, garantia por escrito, review no Google.",
+            "Não iguale preço; comunique valor: 'peça X original é X, remanufaturado nosso é Y com 6 meses de garantia — nunca peça pirata'.",
+          ],
+        },
+        {
+          problema: "Cliente pediu orçamento e sumiu",
+          realidade:
+            "Orçamento sem foto e sem urgência clara vira 'depois eu vejo'. Você não controla a decisão dele, mas controla como o orçamento é apresentado.",
+          caminho: [
+            "Orçamento por WhatsApp SEMPRE com foto/vídeo do problema. Ver a pastilha no fim vende sozinho.",
+            "Divida em 'urgente / recomendado / pode esperar' com prazo pra cada — cria urgência sem empurrar.",
+            "Follow-up em 48h: 'oi João, sobre o orçamento de terça, ainda tá na dúvida?'. Metade fecha aqui.",
+          ],
+        },
+        {
+          problema: "Mês fatura R$ 40k e fecha no vermelho",
+          realidade:
+            "Oficina tem custo fixo pesado (aluguel do galpão, mecânico, luz, ferramenta). Se o mix de serviço é ruim (só isca, sem upsell), o volume não fecha.",
+          caminho: [
+            "Calcule ponto de equilíbrio na aba Ajustes: quantos serviços/mês pra pagar tudo. Esse é seu piso.",
+            "Meça ticket médio real e taxa de aprovação do orçamento — os dois juntos decidem se o mês fecha.",
+            "Serviços de margem alta (diagnóstico eletrônico, ar-condicionado, alinhamento) precisam representar % do faturamento — não só mecânica geral pesada.",
+          ],
+        },
+        {
+          problema: "Não sei quantos leads preciso pra fechar o mês",
+          realidade:
+            "Sem contar visualização → contato → agendamento → carro-que-veio → orçamento aprovado, o mês vira sorte. Receita previsível de oficina é a matemática dessa cadeia.",
+          caminho: [
+            "Anote toda semana: cliques no WhatsApp/Google, agendamentos, carros que efetivamente vieram, orçamentos aprovados, ticket médio.",
+            "Preencha as conversões na aba Ajustes — a calculadora mostra quantos LEADS/semana pra bater o faturamento.",
+            "Onde afunila? Pouco lead? Reforça anúncio do isca. Muito lead e pouco agendamento? Falha na resposta. Muito orçamento e pouca aprovação? Falha na apresentação.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "20 minutos",
+          acoes: [
+            "Feche os números: carros atendidos, ticket médio, aprovação de orçamento, ocupação do elevador (%).",
+            "Confirme agenda da semana seguinte por WhatsApp.",
+            "Cheque estoque dos 20 itens mais usados. Falta algum? Compra hoje.",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "1 hora",
+          acoes: [
+            "Feche o funil (visualização → contato → agendamento → carro → orçamento aprovado) e compare com o Plano do mês.",
+            "Ranking de serviços por margem: qual sobe ticket sem esforço?",
+            "Rodada de follow-up dos clientes da base: quem tá vencendo revisão / troca de óleo? Dispara.",
+            "Escolha próximo isca do mês (roda a cada 60–90 dias pra não cansar o público).",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "salao",
@@ -347,6 +635,149 @@ export const PRESETS: Preset[] = [
       "CMV (insumos): 5–10%.",
       "Taxa de cartão: 2–3%.",
     ],
+    estrategia: {
+      intro:
+        "Salão que fatura bem não é o que tem melhor tesoura — é o que tem a cadeira ocupada. Cada hora-cadeira parada é margem que não volta. O jogo é encher a agenda com serviços de ticket alto, transformar cliente novo em fixo e ter uma matemática clara: quantas pessoas veem → chamam → agendam → comparecem → voltam.",
+      principio:
+        "Você não controla se choveu, se a cliente atrasou ou se a profissional pediu folga. Controla a agenda, o mix de serviços, a política de no-show e a comunicação com a base. Receita previsível de salão é agenda cheia com combos — não é 'quem apareceu, apareceu'.",
+      cliente: {
+        quemE:
+          "Mulher (majoritariamente) 20–55, decisão por indicação, Instagram e proximidade. Escolhe salão por tesoura/mão específica, não pela marca. Fiel enquanto a profissional dela estiver lá — e sensível à experiência, não só ao preço.",
+        ondeEsta:
+          "Instagram (feed e stories da profissional dela — mais que o do salão), WhatsApp (onde a agenda fecha), Google Maps (busca 'salão perto de mim') e indicação amiga (canal #1 do salão pequeno).",
+        oQueEleQuer:
+          "Foto de resultado real (não só logo), horário que caiba no dia dela, profissional que já conhece o gosto dela, atendimento sem espera e a sensação de sair melhor do que entrou (não só 'feito').",
+      },
+      funil: [
+        {
+          emoji: "📸",
+          titulo: "Ser visto — feed que vende agenda",
+          oQueE: "Cliente novo de salão nasce vendo um resultado bonito de alguém real. Feed com só foto de marca e propaganda não gera lead.",
+          numeroPraMedir: "Cliques no WhatsApp/link de agenda por semana no Instagram/Google.",
+          acoes: [
+            "Cada profissional posta seu próprio antes-e-depois: quem viu a mão dela é quem vai marcar com ela.",
+            "Google Meu Negócio completo (fotos reais, serviços, horário, avaliações). É de graça e capta 'salão perto de mim'.",
+            "Story diário mostrando bastidor + agenda da semana com 'ainda tem vaga na quinta às 15h'.",
+          ],
+        },
+        {
+          emoji: "💬",
+          titulo: "Virar contato — botão de agenda em tudo",
+          oQueE: "Cliente não liga mais. Se não tem WhatsApp em 1 clique, ela vai no salão que tem.",
+          numeroPraMedir: "De 10 pessoas que viram o post, quantas mandam mensagem.",
+          acoes: [
+            "Link de WhatsApp na bio, nos stories e nas fotos de resultado.",
+            "Resposta em minutos no comercial (bot básico + humano). No salão, a agenda é ganha pela velocidade.",
+            "Mensagem de boas-vindas com os 3 serviços mais buscados e preço — reduz 5 mensagens de 'quanto custa?'.",
+          ],
+        },
+        {
+          emoji: "📅",
+          titulo: "Agendar com combo — subir o ticket na porta",
+          oQueE: "Agendou só corte? Perdeu R$ 80 de escova, R$ 150 de coloração. O momento de subir ticket é ANTES da cadeira, não depois.",
+          numeroPraMedir: "Ticket médio por agendamento (aba Ajustes) vs. ticket do serviço solo.",
+          acoes: [
+            "Combos prontos com nome e desconto simbólico: 'Combo Cliente Nova' (corte + hidratação), 'Combo Formatura' (mão+pé+escova).",
+            "Sempre sugira o combo no agendamento: 'faz junto a hidratação? Fica 20% mais barato que separado'.",
+            "Serviços premium (progressiva, alongamento, coloração fantasia) precisam de foto no cardápio e destaque no story.",
+          ],
+        },
+        {
+          emoji: "🚪",
+          titulo: "Comparecer — combater no-show",
+          oQueE: "Cadeira reservada + cliente que sumiu = maior custo escondido do salão. Uma hora-cadeira vazia é R$ 100–200 que não voltam.",
+          numeroPraMedir: "Taxa de no-show por dia da semana e por profissional.",
+          acoes: [
+            "Confirmação por WhatsApp 24h antes: 'confirma seu horário?'. Quem não responde, avisa que perde a vaga.",
+            "Sinal de agendamento pra novo cliente ou serviço acima de X reais (via Pix, desconta no atendimento).",
+            "Lista de espera ativa: 2–3 clientes 'a fim de encaixe' que você chama quando alguém desmarca.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Fazer voltar — recorrência é o ouro do salão",
+          oQueE: "Cliente que volta a cada 30–45 dias fez a matemática do salão fechar. Cliente que fez uma vez e sumiu foi custo puro de aquisição.",
+          numeroPraMedir: "% da agenda que é retorno (mesmo cliente) vs. primeira vez.",
+          acoes: [
+            "Já saia do atendimento com o próximo agendado — nunca 'me chama quando quiser'.",
+            "Pacote: 4 escovas com desconto, 6 hidratações pré-pagas. Trava recorrência e caixa antecipado.",
+            "Lembrete automático 25 dias depois: 'já tá na hora do retoque, tenho quarta 15h ou sexta 10h?'.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Profissional saiu e levou a cartela de clientes",
+          realidade:
+            "Se a base de contato mora no celular pessoal da profissional, ela é dona da carteira — não você. Você não controla o coração dela, mas controla de quem é a base.",
+          caminho: [
+            "Contatos ficam SEMPRE no CRM/agenda do salão (Trinks, Booksy, planilha), nunca só no WhatsApp pessoal.",
+            "Comunicação institucional (lembretes, promoções) sai do número do salão, não do pessoal.",
+            "Contrato de partnership com cláusula clara: base é do salão. Discutível, mas essencial pra pequeno salão.",
+          ],
+        },
+        {
+          problema: "Agenda parece cheia e o mês fecha ruim",
+          realidade:
+            "Comissão de 50% + insumo + cartão + aluguel deixa margem apertadíssima em serviço solo. Se o ticket não sobe com combo, o volume não resolve.",
+          caminho: [
+            "Meça o ticket médio real na aba Ajustes. Se está abaixo do meio da faixa, foco em combo e cross-sell no agendamento.",
+            "Serviços premium (química, coloração, alongamento) precisam representar % maior da agenda pra fechar o mês.",
+            "Revise custos fixos (aluguel, luz, insumo). Aluguel percentual > 25% do faturamento é sinal amarelo.",
+          ],
+        },
+        {
+          problema: "Cliente sumiu depois do primeiro atendimento",
+          realidade:
+            "Salão que não trabalha recompra é salão que gasta em anúncio pra pagar o cliente do concorrente. Você não controla a rotina dela, mas controla o próximo agendamento na saída.",
+          caminho: [
+            "Regra do salão: cliente sai do atendimento com o próximo já agendado. Meta: 60%+ saem com retorno marcado.",
+            "Follow-up manual 15 dias depois: 'como ficou o cabelo?'. Simples e reativa.",
+            "Peça avaliação Google/Instagram na saída do atendimento — reforça o vínculo e traz cliente novo.",
+          ],
+        },
+        {
+          problema: "Muito no-show, principalmente na segunda de manhã",
+          realidade:
+            "Você não controla o compromisso dela, mas controla a política de agendamento. Cadeira parada por falta é dinheiro que não estoca — o horário passou.",
+          caminho: [
+            "Confirmação automática 24h antes obrigatória. Sem confirmação, vaga é liberada.",
+            "Horários de risco (segunda cedo, feriado próximo) só com sinal Pix — filtra quem tá comprometido.",
+            "Overbooking calculado nos horários de alta taxa histórica: 20% de falta? Agenda 20% a mais.",
+          ],
+        },
+        {
+          problema: "Não sei quantos posts / anúncios preciso pra encher a agenda",
+          realidade:
+            "Sem medir visualização → contato → agendamento → comparecimento, cada real de anúncio é fé. Receita previsível de salão é a matemática do funil, não a força do dedão.",
+          caminho: [
+            "Marque toda semana: cliques no WhatsApp, agendamentos novos, taxa de comparecimento.",
+            "Preencha as conversões na aba Ajustes — a calculadora mostra quantos leads/semana pra bater a meta.",
+            "O gargalo aparece sozinho: pouco lead? Falta post/anúncio. Muito lead e pouca agenda? Falha na resposta. Muita agenda e faturamento baixo? Falta combo.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "20 minutos",
+          acoes: [
+            "Feche os números: agendamentos, comparecimentos, ticket médio, retorno vs. novos.",
+            "Confirme a agenda da semana seguinte.",
+            "Post de resultado + story com vagas em aberto.",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "1 hora",
+          acoes: [
+            "Ranking de serviço e de profissional (ticket, retorno, comparecimento). Ajuste comissão / horário de acordo.",
+            "Feche o funil (visualização → agendamento → comparecimento) e compare com o Plano do mês.",
+            "Revise combos e crie 1 promoção pra dia/horário mais fraco da semana.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "quiosque",
@@ -376,6 +807,149 @@ export const PRESETS: Preset[] = [
     avisoConfianca:
       "O ticket médio e a taxa de conversão de passantes deste nicho não têm fonte de mercado confiável — são estimativas de partida. CAC também é genérico. Verifique os valores reais do seu shopping/região antes de usar para decisões importantes.",
     notasReferencia: ["Aluguel típico de quiosque: 20–30% do faturamento."],
+    estrategia: {
+      intro:
+        "Quiosque de beleza vive de fluxo. Você paga um aluguel altíssimo (20–30% do faturamento) pra estar onde a pessoa passa — se ela passa e não para, você paga aluguel pra nada. O jogo é converter passante em cliente, subir o ticket com kit e criar recorrência pra não depender só do fluxo do shopping.",
+      principio:
+        "Você não controla o movimento do shopping, o clima nem se o cinema tá cheio. Controla a vitrine, a abordagem, a oferta do dia e o WhatsApp que traz o cliente de volta. Cada passante ignorado é aluguel queimado.",
+      cliente: {
+        quemE:
+          "Mulher (majoritariamente) entre 18 e 45, decidindo por impulso, que passou pra fazer outra coisa (comer, cinema, banco). Compra pequena, emocional, testa produto novo — mas só se algo chamar atenção nos primeiros 3 segundos.",
+        ondeEsta:
+          "Passando na frente do quiosque (canal #1), Instagram local (marca 'em [shopping X]'), TikTok de review de beleza e no WhatsApp (onde a recompra mora — quiosque sem base de WhatsApp é quiosque refém do shopping).",
+        oQueEleQuer:
+          "Descoberta rápida ('experimenta aqui'), preço claro, kit que parece um presente pra si mesma e sensação de barganha (leva 3 paga 2, brinde surpresa).",
+      },
+      funil: [
+        {
+          emoji: "👁️",
+          titulo: "Parar o passante — vitrine e primeiros 3 segundos",
+          oQueE: "Quem não para, não compra. A vitrine, a iluminação e a cara da atendente decidem se a pessoa desacelera ou passa reto.",
+          numeroPraMedir: "Quantas pessoas passaram vs. quantas pararam no quiosque por hora (contagem manual amostral 1x por semana).",
+          acoes: [
+            "Um produto-âncora bem iluminado na quina, com preço grande e visível — não vitrine cheia de tudo.",
+            "Atendente em pé na frente, nunca sentada olhando celular. Sorriso e uma frase-gatilho ('experimenta o novo hidratante?').",
+            "Cheiro conta: difusor com fragrância marcante para 3 metros de raio. Olfato para o passante que a vitrine perdeu.",
+          ],
+        },
+        {
+          emoji: "🤝",
+          titulo: "Abordar e testar — do 'só olhando' pra mão no produto",
+          oQueE: "Cliente que pega o produto na mão compra 5x mais que quem só olha. Abordagem certa é convidar pra experimentar, não pra ouvir vendedor.",
+          numeroPraMedir: "De 10 que pararam, quantas testam algum produto.",
+          acoes: [
+            "Sempre ofereça teste (mão, braço, um cheirinho). 'Posso te mostrar como esse funciona?' abre porta sem pressionar.",
+            "Fale valor, não preço, primeiro: 'esse hidrata por 24h, cabe na bolsa' — o preço vem depois do encanto.",
+            "Se ela recusar, entregue um cartão com QR do Instagram/WhatsApp: 'quando quiser, olha nossas promoções'.",
+          ],
+        },
+        {
+          emoji: "🛍️",
+          titulo: "Fechar a venda — combo antes de único",
+          oQueE: "Ticket de um item só não sustenta o aluguel. A venda tem que nascer combo — 2 unidades, kit, 'leva 3 paga 2'.",
+          numeroPraMedir: "Ticket médio do quiosque (na aba Ajustes).",
+          acoes: [
+            "Nunca ofereça 1 item: sempre 'leva a dupla que sai por X' ou 'com o segundo por metade'.",
+            "Kit-presente montado e embalado na hora — vira ideia para 'já que estou aqui, dou pra minha mãe também'.",
+            "Preço com âncora: um produto premium caro na vitrine faz o kit médio parecer barato.",
+          ],
+        },
+        {
+          emoji: "📲",
+          titulo: "Capturar contato — do caixa pro WhatsApp",
+          oQueE: "Cliente que sai sem virar contato é cliente do shopping, não seu. Sua base de WhatsApp é o único ativo que sobrevive se o quiosque mudar de ponto.",
+          numeroPraMedir: "% de clientes do mês que entraram na lista de WhatsApp.",
+          acoes: [
+            "No caixa, sempre: 'quer entrar na lista VIP? Toda sexta mando o desconto do fim de semana'.",
+            "Incentivo pequeno pra entrar: brinde de amostra ou cupom de 10% na próxima. Custa centavos, vale ouro.",
+            "Nota fiscal no e-mail/WhatsApp já captura o contato de brinde — use a lei a favor.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Fazer voltar — recompra sem depender do fluxo",
+          oQueE: "Segunda-feira chuvosa? Cliente da lista VIP vem quando o shopping tá vazio. É a sua receita previsível.",
+          numeroPraMedir: "% do faturamento que veio de clientes já cadastrados (repetição).",
+          acoes: [
+            "Toda sexta: cardápio da semana com desconto exclusivo pra lista VIP no WhatsApp.",
+            "Aniversário do cliente = cupom de brinde. Simples e emocional.",
+            "Segmente a lista: quem comprou hidratante volta em 60 dias — dispare oferta 45 dias depois.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Movimento do shopping caiu e minha venda foi junto",
+          realidade:
+            "Você não controla âncora do shopping, cinema fechando ou obra na entrada. Controla a sua base própria (WhatsApp, Instagram) e as ações de reativação.",
+          caminho: [
+            "Ative a lista VIP com promoção-relâmpago pra trazer quem já é cliente — não depende do fluxo.",
+            "Faça live/story mostrando os produtos ao vivo do quiosque nos dias fracos — traz gente que já ia passar longe.",
+            "Renegocie o aluguel: com o fluxo caindo, o shopping também tem interesse em manter você — traga números.",
+          ],
+        },
+        {
+          problema: "Vendo pouco no fim do mês (todo mês)",
+          realidade:
+            "A renda do seu cliente tem ciclo. Você não muda o salário dele, mas muda a sua agenda de ofertas pra pegar o começo do mês forte e sobreviver o fim.",
+          caminho: [
+            "Lançamento e kit premium na primeira quinzena. Produto de entrada e leve-3-pague-2 na segunda quinzena.",
+            "Parcelamento sem juros nos últimos 10 dias do mês — desbloqueia compra que ia esperar.",
+            "Programe disparo pra lista VIP no 5º dia útil: salário caiu, oferta na cara.",
+          ],
+        },
+        {
+          problema: "Concorrente do quiosque em frente vende mais barato",
+          realidade:
+            "Guerra de preço em quiosque destrói margem porque o aluguel não cai. Você não controla o preço dele — controla a experiência, o kit e a base.",
+          caminho: [
+            "Não iguale preço unitário: monte kits que ele não tem, com embalagem-presente.",
+            "Atendimento com nome, memória do gosto do cliente, WhatsApp que responde — o que ele não faz é sua vantagem.",
+            "Sua lista VIP é sua muralha: cliente que se sente da casa não atravessa 10 metros por R$ 5.",
+          ],
+        },
+        {
+          problema: "Faturamento parece bom mas o mês fecha ruim",
+          realidade:
+            "Aluguel de quiosque come 20–30% direto. Se o CMV subiu e o ticket não subiu junto, você trabalhou o mês pro shopping.",
+          caminho: [
+            "Preencha custos reais na aba Ajustes (aluguel, taxa cartão, comissão, CMV) — a calculadora mostra o ponto de equilíbrio real.",
+            "Se ticket médio está abaixo da meta, foco imediato em kit e leve-3-pague-2. Vender 1 unidade por vez em quiosque é prejuízo.",
+            "Renegocie aluguel percentual: em shopping fraco, muitos aceitam 'mínimo garantido + %' menor.",
+          ],
+        },
+        {
+          problema: "Não sei quantas pessoas preciso alcançar pra bater a meta",
+          realidade:
+            "Sem contar quantos passantes viram parada, teste, compra e recorrência, é impossível ajustar. Você fica no achismo enquanto o aluguel vence dia 10.",
+          caminho: [
+            "Uma vez por semana, conte manualmente por 1 hora: passantes, paradas, testes, compras. Extrapole pro mês.",
+            "Preencha essas taxas na aba Ajustes — a calculadora mostra quantas pessoas precisam PARAR pra você bater a meta.",
+            "Se a taxa de parada é o gargalo, mexa em vitrine. Se é a de fechamento, treine abordagem. Cada etapa tem uma ação diferente.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "10 minutos",
+          acoes: [
+            "Anote: faturamento, ticket médio, quantos entraram na lista VIP, ranking do produto mais vendido.",
+            "Dispare a oferta de sexta pra lista VIP.",
+            "Troque a vitrine/produto-âncora se o da semana ficou fraco.",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "45 minutos",
+          acoes: [
+            "Feche as taxas do funil (paradas, testes, vendas) e compare com o Plano do mês.",
+            "Cheque o CMV real do mix vendido e se o ticket está acompanhando os aumentos de custo.",
+            "Reveja a divisão do mix (entrada / médio / premium) e reposicione a vitrine.",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "clinica",
@@ -406,6 +980,149 @@ export const PRESETS: Preset[] = [
       { nome: "Pediatria", ticket: 120 },
       { nome: "Cardiologia", ticket: 120 },
     ],
+    estrategia: {
+      intro:
+        "Clínica particular popular não vive de médico bom — vive de agenda cheia. E agenda cheia é resultado de conta simples: quantas pessoas veem, quantas ligam, quantas marcam, quantas comparecem, quantas voltam. O jogo é dominar essa conta e transformar em receita previsível.",
+      principio:
+        "Você não controla convênio, plano do governo nem o preço do concorrente da esquina. Controla a sua agenda, a taxa de comparecimento e o retorno do paciente. Receita previsível nasce quando cada etapa do funil vira número medido — não achismo.",
+      cliente: {
+        quemE:
+          "Paciente que não tem plano de saúde ou tem plano ruim, quer resolver rápido, preço acessível, sem burocracia. Decide por proximidade, indicação e reputação online. Sensível a preço, mas ainda mais sensível a demora e mau atendimento.",
+        ondeEsta:
+          "Google (busca 'clínica popular perto de mim'), Google Maps e reviews, Instagram/Facebook local, WhatsApp (onde a consulta é agendada de verdade) e boca-a-boca do bairro.",
+        oQueEleQuer:
+          "Preço claro no anúncio, atendimento rápido no WhatsApp, horário perto do trabalho ou fim de tarde, médico que escuta e resultado (receita, exame pedido) na hora — não 'volta na semana que vem pra ver o exame'.",
+      },
+      funil: [
+        {
+          emoji: "🔍",
+          titulo: "Ser encontrado — quem procura precisa achar você",
+          oQueE: "Consulta popular é procurada, não empurrada. Se você não aparece no Google e no Maps quando alguém busca, não existe.",
+          numeroPraMedir: "Visualizações no Google Meu Negócio e cliques no botão 'ligar/WhatsApp' por semana.",
+          acoes: [
+            "Google Meu Negócio 100% completo: fotos reais da clínica, especialidades, preços de consulta, horário. É seu maior gerador de lead gratuito.",
+            "Peça avaliação no Google a todo paciente satisfeito no fim da consulta — meta: 4,7+ estrelas com 100+ reviews.",
+            "Anúncio pago local no Google e Instagram por raio (3–5 km) por especialidade — preço no anúncio filtra quem já aceita seu ticket.",
+          ],
+        },
+        {
+          emoji: "💬",
+          titulo: "Virar contato — do clique ao WhatsApp",
+          oQueE: "Quem viu e não escreveu, esqueceu. Cada segundo de atrito entre 'quero marcar' e 'consegui falar com alguém' vira paciente do concorrente.",
+          numeroPraMedir: "De 10 visitantes do Google, quantos chamam no WhatsApp/telefone.",
+          acoes: [
+            "Botão de WhatsApp em tudo: Google, site, Instagram. Nada de formulário de contato.",
+            "Resposta em até 5 minutos no horário comercial. Mais que isso, taxa de agendamento despenca.",
+            "Script de resposta pronto: cumprimento + especialidade disponível + preço + próximos 3 horários. Fecha na primeira mensagem.",
+          ],
+        },
+        {
+          emoji: "📅",
+          titulo: "Agendar — transformar interesse em compromisso",
+          oQueE: "'Vou ver com a família e volto' é 80% de perda. Agendamento firme tem data, hora e, idealmente, confirmação por WhatsApp.",
+          numeroPraMedir: "De 10 conversas no WhatsApp, quantas viram consulta marcada.",
+          acoes: [
+            "Ofereça só 2 horários por vez ('tenho quarta 15h ou quinta 10h, qual prefere?') — mais opções paralisam a decisão.",
+            "Preço fechado sem pegadinha na hora de agendar. Se tem taxa de retorno grátis, diga na hora — isso fecha venda.",
+            "Registre TODO agendamento numa planilha ou sistema simples com fonte (Google, indicação, Instagram): você precisa saber de onde vem cada consulta.",
+          ],
+        },
+        {
+          emoji: "🚪",
+          titulo: "Comparecer — combater o no-show",
+          oQueE: "Agenda cheia com 30% de faltosos é agenda de mentira. Cadeira vazia com médico esperando é o custo mais alto da clínica.",
+          numeroPraMedir: "Taxa de comparecimento: agendados que efetivamente vieram ÷ total agendado.",
+          acoes: [
+            "Confirmação automática por WhatsApp 24h antes: 'confirma sua consulta amanhã 15h respondendo SIM'. Quem não confirma, libera a vaga.",
+            "Overbooking calculado nos horários de pico: se historicamente falta 20%, agende 20% a mais nesse horário.",
+            "Lista de espera ativa: sempre 3–5 pacientes prontos pra encaixar quando alguém desmarca.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Fazer voltar — retorno e recorrência",
+          oQueE: "Paciente satisfeito vira exame, retorno e indicação — sem custo de anúncio nenhum. É onde a margem real da clínica mora.",
+          numeroPraMedir: "% de consultas do mês que são retorno vs. primeira vez.",
+          acoes: [
+            "Já saia da consulta com o próximo passo agendado: exame, retorno, encaminhamento. Não deixe pro paciente 'ligar depois'.",
+            "Pacote de acompanhamento por doença crônica (hipertensão, diabetes, dermatologia estética): receita recorrente previsível.",
+            "Programa de indicação: paciente que indica alguém que consulta ganha desconto no próximo retorno.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Agenda parece cheia mas o dia rende pouco (muito no-show)",
+          realidade:
+            "Você não controla se o paciente vai comparecer — controla a confirmação, o overbooking e a lista de espera. No-show ignorado é caixa jogado fora todo dia.",
+          caminho: [
+            "Meça a taxa por dia da semana / horário. Segunda de manhã falta mais que quinta à tarde? Ajuste overbooking.",
+            "Confirmação automática 24h antes é obrigatória. Quem não confirmar em X horas, a vaga é oferecida à lista de espera.",
+            "Considere cobrar taxa simbólica de reserva descontada na consulta — reduz no-show sem afastar quem realmente quer vir.",
+          ],
+        },
+        {
+          problema: "Concorrente abriu do lado cobrando R$ 20 a menos",
+          realidade:
+            "Guerra de preço em clínica popular é corrida pra baixo — quem ganha é quem tem escala. Você não controla o preço dele; controla a experiência da sua consulta.",
+          caminho: [
+            "Diferencie no atendimento: WhatsApp que responde rápido, agenda no dia, médico que escuta 20 minutos, receita entregue impressa.",
+            "Combos: consulta + retorno grátis em 30 dias. Percepção de valor sobe sem cortar preço.",
+            "Reforce reviews (Google, redes) — reputação alta justifica R$ 20 a mais sem discussão.",
+          ],
+        },
+        {
+          problema: "Fatura bem, mas o mês fecha no vermelho",
+          realidade:
+            "Clínica tem custo fixo alto (aluguel, secretárias, médicos plantão). Ticket popular só fecha conta com volume. Se falta paciente, o custo devora tudo.",
+          caminho: [
+            "Calcule o ponto de equilíbrio na aba Ajustes: quantas consultas/mês pra pagar toda a estrutura. Esse é seu 'não posso vender menos que isso'.",
+            "Especialidades com procedimento (dermato, ginecologia) sobem o ticket médio sem precisar mais paciente.",
+            "Contrate médico como PJ por consulta (não por plantão fixo) enquanto a agenda não trava — variabiliza o custo.",
+          ],
+        },
+        {
+          problema: "Não sei de onde vem meu paciente",
+          realidade:
+            "Se você anuncia em 4 lugares e não sabe qual traz consulta, está queimando dinheiro em 3 e nem sabe qual. Sem medir a fonte, não dá pra decidir onde investir.",
+          caminho: [
+            "Toda ligação/WhatsApp: 'como você nos conheceu?' vira campo obrigatório no agendamento.",
+            "Números de WhatsApp diferentes por canal (um pro Instagram, um pro Google) — a origem se mede sozinha.",
+            "Fim do mês: agrupe consultas por fonte. Corte o que não traz, dobre o que traz.",
+          ],
+        },
+        {
+          problema: "Médico bom pediu pra sair porque a agenda dele não estava cheia",
+          realidade:
+            "Médico não fica onde não fatura. Você não controla a lealdade dele — controla a agenda que oferece. Especialidade sem demanda é problema de captação, não do profissional.",
+          caminho: [
+            "Antes de contratar especialidade nova, faça 1 mês de anúncio pra medir demanda real do bairro.",
+            "Comece o especialista com 1–2 dias/semana e só aumente quando a agenda encher.",
+            "Divulgue a agenda do especialista individualmente — foto, currículo, WhatsApp direto. Especialista com marca própria enche mais.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "20 minutos",
+          acoes: [
+            "Extraia da planilha: consultas realizadas, no-show, ticket médio, fonte de cada paciente novo.",
+            "Confirme agenda da semana seguinte: quem não confirmou perde vaga.",
+            "Compare com o Plano do mês — está no ritmo?",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "1 hora",
+          acoes: [
+            "Feche o funil: visualizações → contatos → agendamentos → comparecimentos → retornos. Onde afunila mais?",
+            "Revise custos fixos e ponto de equilíbrio na aba Ajustes.",
+            "Peça 20 reviews no Google (SMS/WhatsApp pros pacientes satisfeitos do mês).",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "pequeno-produtor",
@@ -433,6 +1150,149 @@ export const PRESETS: Preset[] = [
       ticket: 20,
       custoInsumosPct: 40,
       adicionais: ["Cookie", "Brownie", "Trufa", "Bolo grande sob encomenda"],
+    },
+    estrategia: {
+      intro:
+        "Doce caseiro não morre por falta de gente com vontade — morre por não ter previsibilidade. Quem vive disso vive de três coisas: encomenda que se planeja, ponto de venda que gira sozinho e cliente que volta. Esta página é o mapa; as outras abas são o painel de números.",
+      principio:
+        "Você não controla o preço do ovo nem a moda do concorrente. Controla o tamanho da porção, o valor percebido do seu doce e a agenda da semana. O jogo é transformar 'quem viu' em encomenda combinada — com data, hora e dinheiro na mão.",
+      cliente: {
+        quemE:
+          "Vizinhança, colegas de trabalho da região, mães de escola, escritórios pequenos e clientes de datas (aniversário, dia das mães, páscoa, natal). Compra emocional e por confiança — quem come de você fala de você.",
+        ondeEsta:
+          "WhatsApp (onde a encomenda fecha), Instagram (onde nasce a vontade, com foto e vídeo do processo), grupos de bairro/condomínio e ponto físico parceiro (padaria, cafeteria, salão que revende).",
+        oQueEleQuer:
+          "Foto que dá água na boca, preço claro (unidade, kit, caixa), facilidade pra encomendar e uma sensação de 'feito pra mim' — feito à mão vale mais que produção industrial, esse é o seu ativo.",
+      },
+      funil: [
+        {
+          emoji: "👀",
+          titulo: "Ser visto — alcance na região",
+          oQueE: "Quem não é lembrado não é comprado. Doce artesanal precisa aparecer no feed da vizinhança na semana em que a pessoa vai encomendar.",
+          numeroPraMedir: "Visualizações por post/story por semana e novos contatos no WhatsApp por mês.",
+          acoes: [
+            "Poste o processo, não só o produto: vídeo do recheio, do glacê caindo — mostra que é feito à mão e vale mais.",
+            "Entre em 3 grupos de bairro / condomínio / mães da escola e apareça toda semana com uma foto e um combo.",
+            "Deixe amostra em 1 ponto parceiro (cafeteria, salão): quem prova, pede — e o parceiro ganha uma comissão simbólica.",
+          ],
+        },
+        {
+          emoji: "📱",
+          titulo: "Virar contato — do stories pro WhatsApp",
+          oQueE: "Vontade sem canal direto vira nada. Cada post precisa terminar com 'me chama no zap' e cardápio pronto pra responder.",
+          numeroPraMedir: "De 10 pessoas que viram o post, quantas mandam mensagem?",
+          acoes: [
+            "Cardápio-catálogo no WhatsApp Business com foto, preço, prazo e formas de pagamento — evita 30 min de conversa por pedido.",
+            "Link direto do WhatsApp na bio e em todo story (figurinha de link).",
+            "Responda em minutos: no artesanal, quem demora 2h pra responder perde pra quem responde na hora.",
+          ],
+        },
+        {
+          emoji: "📅",
+          titulo: "Fechar a encomenda — data, hora, sinal",
+          oQueE: "'Depois eu confirmo' é venda perdida. Encomenda de verdade tem data marcada e, quando o volume é maior, sinal pago antes.",
+          numeroPraMedir: "De cada 10 conversas, quantas viram pedido pago (não só 'combinado').",
+          acoes: [
+            "Combos prontos com preço fechado: caixa de 6, 12, 24. Kit reduz a decisão e sobe o ticket sem esforço.",
+            "Encomenda grande (festa, corporativo): 30–50% de sinal via Pix antes de comprar insumo. Trava o cliente e protege seu caixa.",
+            "Prazo mínimo de encomenda claro (ex.: 48h): quem respeita seu prazo é cliente de verdade, quem não respeita é dor de cabeça.",
+          ],
+        },
+        {
+          emoji: "🍫",
+          titulo: "Subir o ticket — kits, upsell e datas",
+          oQueE: "Vender mais pra quem já ia comprar é a venda mais barata. E as datas do calendário são o seu 'verão' — quem se prepara fatura o mês em uma semana.",
+          numeroPraMedir: "Ticket médio por pedido (na aba Ajustes) e faturamento nas datas comemorativas vs. mês comum.",
+          acoes: [
+            "Sempre ofereça 'quer levar mais 2 de outro sabor?' na finalização — 1 em cada 3 aceita.",
+            "Encarte de datas: páscoa, dia das mães, festa junina, natal. Cardápio especial pré-anunciado 30 dias antes com preço maior justificado pelo tema.",
+            "Kit corporativo (café da manhã do escritório, brinde de cliente) — 1 conta corporativa fixa vale 20 clientes soltos.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Fazer voltar — recorrência e indicação",
+          oQueE: "Cliente satisfeito de doce artesanal indica sozinho — se você lembrar dele. Sem lembrança, some.",
+          numeroPraMedir: "Quantos pedidos do mês vieram de quem já comprou antes.",
+          acoes: [
+            "Lista VIP no WhatsApp: toda quinta manda cardápio da semana, um combo em promoção e as datas de entrega.",
+            "Fidelidade simples: 10º pedido ganha um mimo. No artesanal, brinde surpreende mais que desconto.",
+            "Peça foto e depoimento — publique no story com o nome do cliente. Vira propaganda pra rede dele.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Insumo subiu (ovo, chocolate, farinha) e a margem sumiu",
+          realidade:
+            "Você não controla o preço da commodity — controla a receita da porção, a embalagem e a tabela. Segurar preço com CMV subindo é escolher trabalhar de graça.",
+          caminho: [
+            "Refaça a ficha técnica: peso exato de cada insumo por unidade. Sem isso, você não sabe o custo real.",
+            "Reajuste em blocos (ex.: a cada 3 meses), não a cada susto — cliente aceita reajuste programado, não zigue-zague.",
+            "Crie uma linha 'popular' (porção menor) e mantenha a premium com o preço novo — dá saída pros dois bolsos.",
+          ],
+        },
+        {
+          problema: "Encomenda cancelada em cima da hora / cliente sumiu",
+          realidade:
+            "Combinado sem sinal é conversa fiada. Você não controla o compromisso dos outros — controla a regra da sua venda.",
+          caminho: [
+            "Sinal via Pix pra qualquer encomenda acima de X reais. Sem sinal, não entra na agenda.",
+            "Confirmação automática 48h antes por WhatsApp: quem não confirma perde a vaga.",
+            "Regra de cancelamento clara no cardápio (ex.: cancelou em menos de 24h, sinal não volta).",
+          ],
+        },
+        {
+          problema: "Concorrente vende mais barato e cliente compara",
+          realidade:
+            "Guerra de preço no artesanal é competir com fábrica. Você não vence — e não precisa. Seu preço reflete tempo, mão e ingrediente melhor.",
+          caminho: [
+            "Mostre o processo (vídeo, foto) — cliente que vê o trabalho aceita o preço.",
+            "Nunca dê desconto direto no doce; dá brinde ('leva 5, ganha 1') pra proteger a percepção de valor.",
+            "Foque em quem paga: cliente que só compra o mais barato não é seu público, é do supermercado.",
+          ],
+        },
+        {
+          problema: "Vendo bem em data comemorativa e no mês normal fica parado",
+          realidade:
+            "Doce vive de dois ciclos: o previsível (semana normal) e o de pico (datas). Sem trabalhar o previsível, você vive de ansiedade entre uma páscoa e outra.",
+          caminho: [
+            "Instale 3 pontos parceiros pra vender no mês comum: cafeteria, salão, escritório. Comissão simbólica pro parceiro, giro pra você.",
+            "Assinatura simples: 'kit da semana' entregue toda sexta pra 10–20 clientes fixos. Faturamento previsível.",
+            "Antecipe a próxima data: pedidos abertos com desconto 30 dias antes — trava agenda e caixa.",
+          ],
+        },
+        {
+          problema: "Não sei quanto preciso vender pra ganhar dinheiro de verdade",
+          realidade:
+            "No artesanal, é fácil confundir dinheiro entrando com lucro. Se você não separa custo do insumo, sua mão de obra e o seu 'pró-labore', trabalha o mês pra pagar o mercado.",
+          caminho: [
+            "Preencha a aba Ajustes com custo real, seu salário desejado e conta de casa — a calculadora te mostra quantas unidades por mês pra fechar no azul.",
+            "Vá na aba Plano do mês: quantos contatos por semana, quantas encomendas por dia. É a sua receita previsível traduzida em rotina.",
+            "Toda semana, marque quantas encomendas fechou e compare com o plano — desvio de duas semanas seguidas é sinal pra ajustar oferta.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "15 minutos",
+          acoes: [
+            "Poste 3 vezes: um processo, um combo, um depoimento de cliente.",
+            "Mande cardápio da semana pra lista VIP (sexta é o melhor dia).",
+            "Anote: quantos pedidos, ticket médio, quantos clientes voltaram.",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "45 minutos",
+          acoes: [
+            "Refaça o CMV real: total gasto em insumos ÷ faturamento. Está passando de 40%? Ajuste porção ou preço.",
+            "Olhe o calendário: qual é a próxima data? Comece a divulgar 30 dias antes.",
+            "Revise a lista de pontos parceiros: quem vendeu bem, quem parou. Renove ou troque.",
+          ],
+        },
+      ],
     },
   },
 ];
