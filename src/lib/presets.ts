@@ -314,6 +314,150 @@ export const PRESETS: Preset[] = [
       "Taxa de conversão de orçamento em serviço: 55–75%.",
       "Faturamento por elevador: R$ 10.000–25.000/mês.",
     ],
+    estrategia: {
+      intro:
+        "Oficina não fatura por hora aberta — fatura por hora com carro NO elevador rodando. Cada elevador parado é R$ 30–80/h de margem que evaporou. O jogo é velocidade de giro: quanto mais rápido um serviço entra, sai e libera o elevador pro próximo, maior o faturamento — sem contratar mais ninguém nem alugar mais espaço.",
+      principio:
+        "Você não controla se vai chover, se o cliente vai atrasar ou se a peça vai chegar tarde. Controla o giro do elevador, o produto-isca que enche a agenda e a matemática do funil (quantos veem → chamam → agendam → vêm → viram serviço). Faturamento previsível é agenda cheia + giro alto + ticket bem trabalhado.",
+      cliente: {
+        quemE:
+          "Dono do carro entre 25 e 55 anos, popular a médio, que só liga pra oficina quando o carro deu problema OU quando o pneu tá careca. Decide por preço + confiança + proximidade. Uma boa experiência vira cliente pra 5–10 anos.",
+        ondeEsta:
+          "Google Maps ('oficina mecânica perto de mim' — canal #1), WhatsApp (onde a agenda fecha), Instagram/Facebook local (reviews e resultado) e indicação (motorista de app, colega de trabalho).",
+        oQueEleQuer:
+          "Diagnóstico honesto (não empurrar serviço que não precisa), preço fechado antes de aprovar, prazo cumprido, carro pronto quando prometeu e — quando é serviço-isca — sensação clara de barganha.",
+      },
+      funil: [
+        {
+          emoji: "🎯",
+          titulo: "Produto-isca — traz cliente por preço, fatura no combo",
+          oQueE: "Oficina cheia começa com uma oferta imperdível que puxa o carro pra dentro. Jogo do pneu, alinhamento a preço quase de custo, amortecedor remanufaturado — vender o isca 'no negativo' pra elevador não parar. O lucro vem no que descobre no diagnóstico DEPOIS que o carro está lá.",
+          numeroPraMedir: "Ticket médio final dos clientes que vieram pelo isca (deve ser 2–4x o preço do isca).",
+          acoes: [
+            "Escolha 1 produto-isca com dor real e frequência: jogo de pneu com alinhamento incluso, kit de amortecedor remanufaturado, revisão dos 20 mil por preço fechado.",
+            "Anuncie o isca com preço grande e vídeo curto explicando (Instagram + Facebook local + Google). Anúncio de isca não é despesa, é aquisição de cliente.",
+            "TODO carro que entra pelo isca passa por diagnóstico rápido de 15 min (freio, suspensão, correia, óleo). Orçamento adicional entregue impresso ANTES do carro sair.",
+          ],
+        },
+        {
+          emoji: "🔍",
+          titulo: "Ser encontrado — Google Maps é seu maior vendedor",
+          oQueE: "Oficina não vive de branding, vive de emergência. Quando o carro quebra, a pessoa pega o celular e busca 'oficina perto de mim'. Se você não está lá com 4.7 estrelas, o cliente é do outro.",
+          numeroPraMedir: "Cliques em 'ligar' e 'rotas' no Google Meu Negócio por semana.",
+          acoes: [
+            "Google Meu Negócio 100% completo: fotos reais da oficina, dos serviços, do time. Horário certo. Serviços listados.",
+            "TODO cliente satisfeito recebe pedido de review por WhatsApp na saída. Meta: 4.7+ com 100+ reviews.",
+            "Responda TODA avaliação, principalmente as negativas — respondida certo, review ruim vira credibilidade.",
+          ],
+        },
+        {
+          emoji: "💬",
+          titulo: "Do contato ao agendamento firme",
+          oQueE: "'Passa aí quando puder' é agenda fantasma — vira dia com elevador vazio. Agendamento de verdade tem data, hora, serviço e (idealmente) confirmação.",
+          numeroPraMedir: "De cada 10 conversas no WhatsApp/telefone, quantas viram agendamento com hora marcada.",
+          acoes: [
+            "Resposta em minutos no comercial. Cliente com carro parado não espera 2h.",
+            "Ofereça só 2 horários por vez ('tenho quarta 8h ou quinta 14h?') — decisão rápida.",
+            "Registre TODO agendamento numa planilha/agenda digital com fonte (Google, indicação, anúncio). Você precisa saber quem traz cliente.",
+          ],
+        },
+        {
+          emoji: "🛠️",
+          titulo: "Aprovação do orçamento — a venda de verdade",
+          oQueE: "O carro no elevador é uma oportunidade de 40 minutos de conversa. Diagnóstico bem feito + orçamento claro + confiança = orçamento aprovado. Sem isso, é só o serviço mínimo e o cliente vai embora.",
+          numeroPraMedir: "% dos orçamentos apresentados que são aprovados (meta 55–75%).",
+          acoes: [
+            "Orçamento por escrito com foto/vídeo do problema real no carro (WhatsApp). Ver a peça gasta vende sozinho.",
+            "Divida em 'urgente / recomendado / pode esperar' — cliente compra confiança, não empurrão.",
+            "Preço fechado, prazo fechado. Passou disso, você absorve. Cliente que confia volta e indica.",
+          ],
+        },
+        {
+          emoji: "🔁",
+          titulo: "Retorno e recorrência — a mina de ouro escondida",
+          oQueE: "Carro precisa de manutenção a cada 6–12 meses. Cliente da base é venda sem custo de aquisição — mas some se você não lembrar dele.",
+          numeroPraMedir: "% do faturamento vindo de cliente que já esteve na oficina (meta 55–70%).",
+          acoes: [
+            "Cadastre TODO carro que entra: placa, KM, próxima troca de óleo/correia. Sistema simples ou planilha basta.",
+            "Lembrete automático por WhatsApp: 'olá João, seu Onix bateu 6 meses da revisão. Tenho terça 10h ou sábado 8h'.",
+            "Programa 'cliente da casa': revisão anual a preço fechado, alinhamento incluso. Vira renda recorrente previsível.",
+          ],
+        },
+      ],
+      problemas: [
+        {
+          problema: "Elevador ficou parado 3 dias esperando peça",
+          realidade:
+            "Cada dia de elevador parado é R$ 300–800 de margem perdida — e não volta. Você não controla o entregador da autopeça, mas controla o estoque mínimo, o fornecedor B e a política de aprovação.",
+          caminho: [
+            "Mapeie os 20 itens mais usados (óleo, filtro, pastilha, correia mais comum). Estoque mínimo desses NÃO negociável.",
+            "Sempre tenha 2 fornecedores por categoria. Cotação em 10 min pelos dois. O que entrega no dia leva a compra.",
+            "Só aprove orçamento com peça garantida no estoque OU chegada confirmada em 24h. Enquanto isso, prioriza outro carro no elevador.",
+          ],
+        },
+        {
+          problema: "Concorrente novo abriu cobrando metade e roubou cliente",
+          realidade:
+            "Guerra de preço em oficina é corrida pro buraco: se você corta 30%, corta 100% da margem. Você não controla ele — controla seu diferencial e seu produto-isca.",
+          caminho: [
+            "Você também tem seu isca: alinhamento a R$ 40, jogo de pneu com margem zero. Isca traz o cliente; o carro no elevador gera o ticket alto.",
+            "Diferencie por confiança visível: foto/vídeo da peça trocada, garantia por escrito, review no Google.",
+            "Não iguale preço; comunique valor: 'peça X original é X, remanufaturado nosso é Y com 6 meses de garantia — nunca peça pirata'.",
+          ],
+        },
+        {
+          problema: "Cliente pediu orçamento e sumiu",
+          realidade:
+            "Orçamento sem foto e sem urgência clara vira 'depois eu vejo'. Você não controla a decisão dele, mas controla como o orçamento é apresentado.",
+          caminho: [
+            "Orçamento por WhatsApp SEMPRE com foto/vídeo do problema. Ver a pastilha no fim vende sozinho.",
+            "Divida em 'urgente / recomendado / pode esperar' com prazo pra cada — cria urgência sem empurrar.",
+            "Follow-up em 48h: 'oi João, sobre o orçamento de terça, ainda tá na dúvida?'. Metade fecha aqui.",
+          ],
+        },
+        {
+          problema: "Mês fatura R$ 40k e fecha no vermelho",
+          realidade:
+            "Oficina tem custo fixo pesado (aluguel do galpão, mecânico, luz, ferramenta). Se o mix de serviço é ruim (só isca, sem upsell), o volume não fecha.",
+          caminho: [
+            "Calcule ponto de equilíbrio na aba Ajustes: quantos serviços/mês pra pagar tudo. Esse é seu piso.",
+            "Meça ticket médio real e taxa de aprovação do orçamento — os dois juntos decidem se o mês fecha.",
+            "Serviços de margem alta (diagnóstico eletrônico, ar-condicionado, alinhamento) precisam representar % do faturamento — não só mecânica geral pesada.",
+          ],
+        },
+        {
+          problema: "Não sei quantos leads preciso pra fechar o mês",
+          realidade:
+            "Sem contar visualização → contato → agendamento → carro-que-veio → orçamento aprovado, o mês vira sorte. Receita previsível de oficina é a matemática dessa cadeia.",
+          caminho: [
+            "Anote toda semana: cliques no WhatsApp/Google, agendamentos, carros que efetivamente vieram, orçamentos aprovados, ticket médio.",
+            "Preencha as conversões na aba Ajustes — a calculadora mostra quantos LEADS/semana pra bater o faturamento.",
+            "Onde afunila? Pouco lead? Reforça anúncio do isca. Muito lead e pouco agendamento? Falha na resposta. Muito orçamento e pouca aprovação? Falha na apresentação.",
+          ],
+        },
+      ],
+      rotina: [
+        {
+          frequencia: "Toda semana",
+          duracao: "20 minutos",
+          acoes: [
+            "Feche os números: carros atendidos, ticket médio, aprovação de orçamento, ocupação do elevador (%).",
+            "Confirme agenda da semana seguinte por WhatsApp.",
+            "Cheque estoque dos 20 itens mais usados. Falta algum? Compra hoje.",
+          ],
+        },
+        {
+          frequencia: "Todo mês",
+          duracao: "1 hora",
+          acoes: [
+            "Feche o funil (visualização → contato → agendamento → carro → orçamento aprovado) e compare com o Plano do mês.",
+            "Ranking de serviços por margem: qual sobe ticket sem esforço?",
+            "Rodada de follow-up dos clientes da base: quem tá vencendo revisão / troca de óleo? Dispara.",
+            "Escolha próximo isca do mês (roda a cada 60–90 dias pra não cansar o público).",
+          ],
+        },
+      ],
+    },
   },
   {
     id: "salao",
