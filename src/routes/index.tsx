@@ -299,16 +299,20 @@ function Index() {
   const metaEfetiva = state.metaLucro + custosFixos;
   const margem = state.ticketMedio - custoUnitario;
 
-  // Anúncio pago é despesa de verdade: em média, cada venda carrega o CAC
-  // médio na fatia que não vem do orgânico. É isso que faz CAC e % orgânico
-  // mexerem no resultado final — sem esse desconto, o "no bolso" mentiria.
+  // Anúncio pago é despesa de verdade: cada venda carrega o CAC médio na
+  // fatia que não vem do orgânico. É isso que faz CAC e % orgânico mexerem
+  // no resultado final — sem esse desconto, o "no bolso" mentiria.
+  //
+  // O % orgânico usado aqui é o do MÊS EM REGIME (último mês do plano),
+  // porque o painel mostra "como fica o seu mês padrão quando o negócio já
+  // rodou a rampa". Usar a média da rampa inflava as despesas do mês padrão
+  // — os meses iniciais, mais caros em anúncio, continuam visíveis mês a
+  // mês na aba Plano.
   const cacMed = (state.cacMin + state.cacMax) / 2;
   const convMed = (state.convMin + state.convMax) / 2;
-  const pctOrgAvg =
-    state.meses.length > 0
-      ? state.meses.reduce((s, m) => s + m.pctOrganico, 0) / state.meses.length
-      : 0;
-  const custoAdsPorVenda = (1 - pctOrgAvg / 100) * cacMed;
+  const pctOrgRegime =
+    state.meses.length > 0 ? state.meses[state.meses.length - 1].pctOrganico : 50;
+  const custoAdsPorVenda = (1 - pctOrgRegime / 100) * cacMed;
   const margemEfetiva = margem - custoAdsPorVenda;
 
   // Números canônicos do mês (usados na barra fixa e na aba Meta)
@@ -316,19 +320,19 @@ function Index() {
   const investAdsMes = isFinite(unidadesMeta) ? unidadesMeta * custoAdsPorVenda : Infinity;
   const alcanceMes =
     isFinite(unidadesMeta) && convMed > 0
-      ? Math.ceil((unidadesMeta * (pctOrgAvg / 100)) / (convMed / 100))
+      ? Math.ceil((unidadesMeta * (pctOrgRegime / 100)) / (convMed / 100))
       : Infinity;
 
   // Três cenários pro painel de resultado: otimista (CAC mín + conversão
   // máx), médio e pessimista (CAC máx + conversão mín). É a faixa que o
   // usuário vê embaixo de cada número grande.
   const cenario = (cac: number, conv: number) => {
-    const ads = (1 - pctOrgAvg / 100) * cac;
+    const ads = (1 - pctOrgRegime / 100) * cac;
     const marg = margem - ads;
     const un = marg > 0 ? Math.ceil(metaEfetiva / marg) : Infinity;
     const inv = isFinite(un) ? un * ads : Infinity;
     const alc =
-      isFinite(un) && conv > 0 ? Math.ceil((un * (pctOrgAvg / 100)) / (conv / 100)) : Infinity;
+      isFinite(un) && conv > 0 ? Math.ceil((un * (pctOrgRegime / 100)) / (conv / 100)) : Infinity;
     const rec = isFinite(un) ? un * state.ticketMedio : Infinity;
     const desp = isFinite(un) ? custosFixos + un * custoUnitario + inv : Infinity;
     return { un, inv, alc, rec, desp };
@@ -1224,6 +1228,69 @@ function MetaGuiadaTab({
           </p>
         )}
       </div>
+
+      {/* Passo a passo: da receita ao bolso */}
+      {margemEfetiva > 0 && isFinite(unidadesReal) && (
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-3">
+            🧮 Passo a passo: como a receita vira dinheiro no bolso
+          </div>
+          {(() => {
+            const receitaMes = unidadesReal * state.ticketMedio;
+            const varMes = unidadesReal * ((state.ticketMedio * custoVarPct) / 100);
+            const adsMes = unidadesReal * custoAdsPorVenda;
+            const bolsoMes = receitaMes - varMes - adsMes - custosFixos;
+            const linhas = [
+              {
+                rotulo: `Você vende ${num(unidadesReal)} ${plural(unidadesReal, unidade)} × ${brl(state.ticketMedio)}`,
+                sub: "sua receita do mês",
+                valor: brl(receitaMes),
+                classe: "text-primary",
+              },
+              {
+                rotulo: `− Custos de cada venda (${custoVarPct.toFixed(1).replace(".", ",")}%)`,
+                sub: "insumos, comissão, cartão, impostos…",
+                valor: `− ${brl(varMes)}`,
+                classe: "text-destructive",
+              },
+              {
+                rotulo: `− Anúncios (~${brl(custoAdsPorVenda)} por venda)`,
+                sub: "pra trazer a fatia que não vem do orgânico",
+                valor: `− ${brl(adsMes)}`,
+                classe: "text-destructive",
+              },
+              {
+                rotulo: "− Despesas fixas",
+                sub: "aluguel, contas, contador…",
+                valor: `− ${brl(custosFixos)}`,
+                classe: "text-destructive",
+              },
+            ];
+            return (
+              <div className="space-y-1.5">
+                {linhas.map((l) => (
+                  <div
+                    key={l.rotulo}
+                    className="flex items-baseline justify-between gap-3 text-sm border-b border-border/50 pb-1.5"
+                  >
+                    <div className="min-w-0">
+                      <div className="text-foreground">{l.rotulo}</div>
+                      <div className="text-[10px] text-muted-foreground">{l.sub}</div>
+                    </div>
+                    <div className={`font-display whitespace-nowrap ${l.classe}`}>{l.valor}</div>
+                  </div>
+                ))}
+                <div className="flex items-baseline justify-between gap-3 pt-1">
+                  <div className="text-sm font-semibold">= No seu bolso</div>
+                  <div className="font-display text-xl text-[color:var(--color-success)]">
+                    {brl(bolsoMes)} ✓
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
 
       {/* Referência de mercado — secundária, sempre visível */}
       <div className="rounded-xl border border-border bg-card p-4">
@@ -2634,10 +2701,9 @@ function Dashboard({
   const metaEfetiva = metaLucro + custosFixos;
   // Mesma regra do resto do app: cada venda carrega o custo médio de anúncio
   // na fatia que não vem do orgânico.
-  const pctOrgAvgCalc =
-    meses.length > 0 ? meses.reduce((s, m) => s + m.pctOrganico, 0) / meses.length : 0;
+  const pctOrgRegimeCalc = meses.length > 0 ? meses[meses.length - 1].pctOrganico : 0;
   const cacMedio = (cacMin + cacMax) / 2;
-  const adsPorVenda = (1 - pctOrgAvgCalc / 100) * cacMedio;
+  const adsPorVenda = (1 - pctOrgRegimeCalc / 100) * cacMedio;
   const mcEfetiva = mc - adsPorVenda;
   const breakEven = mcEfetiva > 0 ? Math.ceil(metaEfetiva / mcEfetiva) : Infinity;
   const pontoEquilibrio = mcEfetiva > 0 ? Math.ceil(custosFixos / mcEfetiva) : 0;
@@ -2658,8 +2724,7 @@ function Dashboard({
   const receitaDia = receitaMes / diasVenda;
   const lucroDia = metaLucro / diasVenda;
 
-  const pctOrgAvg = meses.length > 0 ? meses.reduce((s, m) => s + m.pctOrganico, 0) / meses.length : 0;
-  const unidadesPagas = isFinite(breakEven) ? breakEven * (1 - pctOrgAvg / 100) : 0;
+  const unidadesPagas = isFinite(breakEven) ? breakEven * (1 - pctOrgRegimeCalc / 100) : 0;
   const cacMed = (cacMin + cacMax) / 2;
   const investAds = unidadesPagas * cacMed;
   const cpmAlvoMin = convMin > 0 ? cacMin * (convMin / 100) * 1000 : 0;
@@ -2816,7 +2881,8 @@ function Dashboard({
           Eficiência do anúncio pago
         </div>
         <div className="text-xs text-muted-foreground mb-3">
-          Considerando que {pctOrgAvg.toFixed(0)}% das vendas vêm do orgânico (média dos 5 meses).
+          Considerando que {pctOrgRegimeCalc.toFixed(0)}% das vendas vêm do orgânico (mês em
+          regime — o último do seu plano).
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           <MiniKpi
